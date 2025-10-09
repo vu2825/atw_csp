@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bussines.User;
-import jakarta.annotation.Resource;
 
 import javax.sql.DataSource;
 
@@ -29,7 +28,7 @@ public class UserDB {
 	public List<User> getAllUser() {
 		List<User> users = new ArrayList<>();
 		try (Connection conn = dataSource.getConnection();
-				PreparedStatement ps = conn.prepareStatement("SELECT * FROM user");
+				PreparedStatement ps = conn.prepareStatement("SELECT * FROM users");
 				ResultSet rs = ps.executeQuery();) {
 			while (rs.next()) {
 				User user = new User();
