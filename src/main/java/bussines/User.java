@@ -16,6 +16,9 @@ public class User {
 		this.isPremium = isPremium;
 		this.isAdmin = isAdmin;
 	}
+	public User() {
+		
+	}
 
 	public int getId() {
 		return id;
