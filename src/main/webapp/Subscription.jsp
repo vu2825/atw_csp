@@ -251,6 +251,39 @@ body.light-mode .plan-card {
 .hidden {
 	display: none;
 }
+
+/* Alert (thông báo) */
+.alert {
+	max-width: 720px; /* Giới hạn độ rộng để dễ đọc */
+	margin: 0 auto 20px; /* Căn giữa khối và thêm khoảng cách dưới */
+	padding: 12px 16px;
+	border-radius: 8px;
+	border: 1px solid transparent;
+	text-align: center; /* Căn giữa chữ/icon */
+	display: flex; /* Căn giữa cả nội dung */
+	align-items: center; /* Căn giữa theo trục dọc */
+	justify-content: center; /* Căn giữa theo trục ngang */
+	gap: 8px;
+}
+
+/* Thành công (xanh) - theo palette alert-success Bootstrap */
+.alert-success {
+	color: #0f5132;
+	background-color: #d1e7dd;
+	border-color: #badbcc;
+}
+
+/* Lỗi (đỏ) - theo palette alert-danger Bootstrap */
+.alert-error {
+	color: #842029;
+	background-color: #f8d7da;
+	border-color: #f5c2c7;
+}
+
+/* Tùy chọn: cỡ icon hài hòa */
+.alert i {
+	font-size: 18px;
+}
 </style>
 </head>
 <body>
@@ -283,10 +316,27 @@ body.light-mode .plan-card {
 		<p
 			style="text-align: center; color: #6c757d; margin-bottom: 40px; padding: 0 20px;">Khuyến
 			mãi đặc biệt - Tiết kiệm ngay hôm nay với giá giảm!</p>
+
+		<c:choose>
+			<c:when test="${not empty message}">
+				<div class="alert alert-success">
+					<i class="fa-solid fa-circle-check"></i>
+					<c:out value="${message}" />
+				</div>
+			</c:when>
+			<c:otherwise>
+				<div class="alert alert-error">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+					<c:out value="${error}" />
+				</div>
+			</c:otherwise>
+		</c:choose>
+
+
 		<div class="plans-container">
 			<!-- Gói 1 Tháng -->
 			<form action="RegisterSubcription" method="POST">
-				<input class="hidden" name="plan" value="1M"/>
+				<input class="hidden" name="plan" value="oneMonth" />
 				<div class="plan-card">
 					<div class="save-badge">Tiết kiệm 20%</div>
 					<div class="plan-name">Gói 1 Tháng</div>
@@ -306,42 +356,51 @@ body.light-mode .plan-card {
 			</form>
 
 			<!-- Gói 6 Tháng -->
-			<div class="plan-card">
-				<div class="save-badge">Tiết kiệm 25%</div>
-				<div class="plan-name">Gói 6 Tháng</div>
-				<div class="plan-price">
-					<span class="original-price">$59.94</span> <span class="sale-price">$49.99</span>
+			<form action="RegisterSubcription" method="POST">
+				<input class="hidden" name="plan" value="sixMonth" />
+				<div class="plan-card">
+					<div class="save-badge">Tiết kiệm 25%</div>
+					<div class="plan-name">Gói 6 Tháng</div>
+					<div class="plan-price">
+						<span class="original-price">$59.94</span> <span
+							class="sale-price">$49.99</span>
+					</div>
+					<div class="plan-duration">Hạn sử dụng: 6 tháng</div>
+					<ul class="feature">
+						<li>• Xem phim không giới hạn</li>
+						<li>• Chất lượng HD & 4K</li>
+						<li>• 3 thiết bị đồng thời</li>
+						<li>• Không quảng cáo</li>
+						<li>• Tải xuống offline</li>
+					</ul>
+					<button class="buy-button">Đăng Ký Ngay</button>
 				</div>
-				<div class="plan-duration">Hạn sử dụng: 6 tháng</div>
-				<ul class="feature">
-					<li>• Xem phim không giới hạn</li>
-					<li>• Chất lượng HD & 4K</li>
-					<li>• 3 thiết bị đồng thời</li>
-					<li>• Không quảng cáo</li>
-					<li>• Tải xuống offline</li>
-				</ul>
-				<button class="buy-button">Đăng Ký Ngay</button>
-			</div>
+			</form>
+
 
 			<!-- Gói 1 Năm -->
-			<div class="plan-card">
-				<div class="save-badge">Tiết kiệm 30%</div>
-				<div class="plan-name">Gói 1 Năm</div>
-				<div class="plan-price">
-					<span class="original-price">$119.88</span> <span
-						class="sale-price">$99.99</span>
+			<form action="RegisterSubcription" method="POST">
+				<input class="hidden" name="plan" value="twelveMonth" />
+				<div class="plan-card">
+					<div class="save-badge">Tiết kiệm 30%</div>
+					<div class="plan-name">Gói 1 Năm</div>
+					<div class="plan-price">
+						<span class="original-price">$119.88</span> <span
+							class="sale-price">$99.99</span>
+					</div>
+					<div class="plan-duration">Hạn sử dụng: 12 tháng</div>
+					<ul class="feature">
+						<li>• Xem phim không giới hạn</li>
+						<li>• Chất lượng 4K Ultra HD</li>
+						<li>• 4 thiết bị đồng thời</li>
+						<li>• Không quảng cáo</li>
+						<li>• Tải xuống offline</li>
+						<li>• Hỗ trợ ưu tiên</li>
+					</ul>
+					<button class="buy-button">Đăng Ký Ngay</button>
 				</div>
-				<div class="plan-duration">Hạn sử dụng: 12 tháng</div>
-				<ul class="feature">
-					<li>• Xem phim không giới hạn</li>
-					<li>• Chất lượng 4K Ultra HD</li>
-					<li>• 4 thiết bị đồng thời</li>
-					<li>• Không quảng cáo</li>
-					<li>• Tải xuống offline</li>
-					<li>• Hỗ trợ ưu tiên</li>
-				</ul>
-				<button class="buy-button">Đăng Ký Ngay</button>
-			</div>
+			</form>
+
 		</div>
 	</main>
 

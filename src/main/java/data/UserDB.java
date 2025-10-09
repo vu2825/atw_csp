@@ -35,6 +35,8 @@ public class UserDB {
 				user.setId(rs.getInt("id"));
 				user.setUsername(rs.getString("username"));
 				user.setEmail(rs.getString("email"));
+				user.setWallet(rs.getInt("wallet"));
+				user.setIsAdmin(rs.getBoolean("is_admin"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -51,8 +53,10 @@ public class UserDB {
 				if (rs.next()) {
 					user = new User();
 					user.setId(rs.getInt("id"));
-					user.setUsername(rs.getString("name"));
+					user.setUsername(rs.getString("username"));
 					user.setEmail(rs.getString("email"));
+					user.setWallet(rs.getInt("wallet"));
+					user.setIsAdmin(rs.getBoolean("is_admin"));
 				}
 			}
 		} catch (SQLException e) {
@@ -61,10 +65,10 @@ public class UserDB {
 		return user; // Trả về User hoặc null nếu không tìm thấy
 	}
 	
-	public void updateWallet(int userId, int newWallet) {
+	public void updateWallet(double newWallet, int userId ) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement("UPDATE users SET wallet = ? WHERE id = ?")) {
-            ps.setInt(1, newWallet);
+            ps.setDouble(1, newWallet);
             ps.setInt(2, userId);
             ps.executeUpdate();
         } catch (SQLException e) {

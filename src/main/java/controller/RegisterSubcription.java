@@ -17,13 +17,17 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RegisterSubcription extends HttpServlet {
     @Resource(name = "jdbc/MySQLDB")  // Inject DataSource từ JNDI
     private DataSource dataSource;
+    double oneMonth = 9.99;
+    double sixMonth = 49.99;
+    double twelveMonth = 99.99;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String plan = req.getParameter("plan");
-        String userIdStr = req.getParameter("userId");  // Lấy userId từ form/param
-        int userId = Integer.parseInt(userIdStr != null ? userIdStr : "1");  // Default 1 nếu null, nhưng tốt hơn validate
-
+        
+        String userIdStr = req.getParameter("userId"); 
+        int userId = Integer.parseInt(userIdStr != null ? userIdStr : "1");  
+        System.out.println(plan);
         System.out.println("Plan: " + plan + ", UserId: " + userId);
 
         try {
@@ -39,21 +43,37 @@ public class RegisterSubcription extends HttpServlet {
                 return;
             }
 
-            int walletUser = user.getWallet();  // Giả sử User có getWallet()
-            System.out.println("Wallet: " + walletUser);
+            double walletUser = user.getWallet();
 
-            // Logic subscription cơ bản (ví dụ: check wallet đủ cho plan)
-            int planCost = getPlanCost(plan);  // Implement method này, ví dụ dựa trên plan
+            double planCost = 0;
+            switch (plan) {
+              case "oneMonth":
+                planCost = oneMonth;
+                break;
+              case "sixMonth":
+                planCost = sixMonth;
+                break;
+              case "twelveMonth":
+                planCost = twelveMonth;
+                break;
+              default:
+                planCost = 0;
+            }
+
+
+            
             if (walletUser >= planCost) {
-                // Update wallet: trừ cost
-                int newWallet = walletUser - planCost;
-                userDB.updateWallet(userId, newWallet);
+                double newWallet = walletUser - planCost;
+                userDB.updateWallet(newWallet, userId);
                 user.setWallet(newWallet);
                 req.setAttribute("message", "Subscription successful for plan: " + plan);
-                getServletContext().getRequestDispatcher("/success.jsp").forward(req, res);  // Forward success page
+                req.setAttribute("message", "Cảm ơn bạn đã mua hàng thành công");
+            	req.setAttribute("error", "");
+                getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);  // Forward success page
             } else {
-                req.setAttribute("error", "Insufficient wallet for plan: " + plan);
-                getServletContext().getRequestDispatcher("/error.jsp").forward(req, res);
+            	req.setAttribute("message", "");
+            	req.setAttribute("error", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
+                getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
             }
         } catch (NumberFormatException e) {
             // Handle invalid userId

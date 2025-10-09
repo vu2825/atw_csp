@@ -5,14 +5,15 @@ public class User {
 	public String username;
 	public String password;
 	public String email;
-	public int wallet;
+	public double wallet;
 	public Boolean isPremium;
 	public Boolean isAdmin;
 	
-	public User(String username, String password, String email, Boolean isPremium, Boolean isAdmin){
+	public User(int id,String username,  String email, int wallet, Boolean isPremium, Boolean isAdmin){
+		this.id = id;
 		this.username = username;
-		this.password = password;
 		this.email = email;
+		this.wallet = wallet;
 		this.isPremium = isPremium;
 		this.isAdmin = isAdmin;
 	}
@@ -52,11 +53,11 @@ public class User {
 		this.email = email;
 	}
 
-	public int getWallet() {
+	public double getWallet() {
 		return wallet;
 	}
 
-	public void setWallet(int wallet) {
+	public void setWallet(double wallet) {
 		this.wallet = wallet;
 	}
 
