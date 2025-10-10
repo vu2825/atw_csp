@@ -65,8 +65,15 @@ public class RegisterSubcription extends HttpServlet {
 			default:
 				planCost = 0;
 			}
+			
+			UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
 
-			if (walletUser >= planCost) {
+			if(usersSubscriptionDB.checkSubscriptionUser(user.id)) {
+				req.setAttribute("message", "");
+				req.setAttribute("error", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
+				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
+			}
+			else if (walletUser >= planCost) {
 				double newWallet = walletUser - planCost;
 				userDB.updateWallet(newWallet, userId);
 				user.setWallet(newWallet);
@@ -106,12 +113,11 @@ public class RegisterSubcription extends HttpServlet {
 				
 				us.setStatus(SubscriptionStatus.fromDb("active"));
 				
-				UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
-				System.out.print(123);
 				usersSubscriptionDB.addSubscription(us);
 
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res); // Forward success page
-			} else {
+			} 
+			else {
 				req.setAttribute("message", "");
 				req.setAttribute("error", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
