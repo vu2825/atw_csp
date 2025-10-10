@@ -56,7 +56,7 @@ public class UserDB {
 					user.setUsername(rs.getString("username"));
 					user.setEmail(rs.getString("email"));
 					user.setWallet(rs.getInt("wallet"));
-					user.setIsAdmin(rs.getBoolean("is_admin"));
+					user.setIsAdmin(rs.getBoolean("isAdmin"));
 				}
 			}
 		} catch (SQLException e) {
