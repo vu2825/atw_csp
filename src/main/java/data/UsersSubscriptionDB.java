@@ -42,6 +42,19 @@ public class UsersSubscriptionDB {
 		}
 	}
 
+	public boolean checkSubscriptionUser(int userId) {
+		final String sql = "SELECT 1 FROM users_subscription WHERE user_id = ? LIMIT 1";
+		try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, userId);
+			try (ResultSet rs = ps.executeQuery()) {
+				return rs.next(); // có ít nhất 1 dòng
+			}
+		} catch (SQLException e) {
+			// log rồi chọn 1 trong 2: trả false hoặc ném RuntimeException
+			throw new RuntimeException("Failed to check subscription", e);
+		}
+	}
+
 	public UsersSubscription getSubscriptionForUser(int userId) {
 		UsersSubscription s = null;
 		String sql = "SELECT id,user_id,plan,price_cents,started_at,expires_at,status,created_at,updated_at "
