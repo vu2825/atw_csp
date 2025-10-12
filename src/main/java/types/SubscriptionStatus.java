@@ -19,3 +19,4 @@ public enum SubscriptionStatus {
 	    return name().toLowerCase(java.util.Locale.ROOT);
 	  }
 }
+

@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -18,42 +19,58 @@ public class TopUpRequest extends HttpServlet {
 	private DataSource dataSource;
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-	    String action = req.getParameter("action");
-	    String amountStr = req.getParameter("amount");
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		int userId = 1; // TODO: get from session/auth
+		try {
+			UserDB userDB = new UserDB(dataSource);
+			List<service.TopUpRequest> topups = userDB.findAllTopupsOfUser(userId);
+			req.setAttribute("topups", topups);
 
-	    if ("AddCredit".equals(action)) {
-	        try {
-	            double amount = Double.parseDouble(amountStr);
-	            if (amount <= 0d) {
-	                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Amount must be > 0");
-	                return;
-	            }
+			String msg = req.getParameter("message");
+			if (msg != null && !msg.isEmpty()) {
+				req.setAttribute("message", msg);
+			}
 
-	            UserDB userDB = new UserDB(dataSource);
-	            userDB.sendAddCredit(amount, 1);
-
-	            // PRG: tránh double submit
-	            res.sendRedirect(req.getContextPath() + "/AddCreditUser.jsp?message=Send+Add+Credit+Successfully!");
-	            return; // rất quan trọng để không chạy tiếp
-	        } catch (NumberFormatException e) {
-	            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid amount");
-	            return;
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database or server error");
-	            return;
-	        }
-	    }
-
-	    // Mặc định điều hướng trang chủ (GET)
-	    res.sendRedirect(req.getContextPath() + "/");
+			getServletContext().getRequestDispatcher("/AddCreditUser.jsp").forward(req, res);
+		} catch (Exception e) {
+			e.printStackTrace();
+			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database or server error");
+		}
 	}
 
-
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		doPost(req, res);
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String action = req.getParameter("action");
+		String amountStr = req.getParameter("amount");
+
+		if ("AddCredit".equals(action)) {
+			try {
+				double amount = Double.parseDouble(amountStr);
+				if (amount <= 0d) {
+					res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Amount must be > 0");
+					return;
+				}
+
+				int userId = 1; // TODO: from session/auth
+				UserDB userDB = new UserDB(dataSource);
+				userDB.sendAddCredit(amount, userId);
+
+				// PRG: redirect to GET so JSP loads fresh data
+				res.sendRedirect(req.getContextPath() + "/TopUpRequest?message="
+						+ java.net.URLEncoder.encode("Send Request Successfully !", "UTF-8"));
+				return;
+			} catch (NumberFormatException e) {
+				res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid amount");
+				return;
+			} catch (Exception e) {
+				e.printStackTrace();
+				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database or server error");
+				return;
+			}
+		}
+
+		// Default: show page via GET
+		res.sendRedirect(req.getContextPath() + "/TopUpRequest");
 	}
 
 }
