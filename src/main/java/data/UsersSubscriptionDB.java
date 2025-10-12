@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
+
+import service.UsersSubscription;
+
 import java.sql.Timestamp;
 
-import bussines.UsersSubscription;
 import types.SubscriptionStatus;
 
 public class UsersSubscriptionDB {
@@ -86,5 +88,7 @@ public class UsersSubscriptionDB {
 		}
 		return s;
 	}
+	
+	
 
 }

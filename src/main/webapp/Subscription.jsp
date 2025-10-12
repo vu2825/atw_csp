@@ -317,20 +317,21 @@ body.light-mode .plan-card {
 			style="text-align: center; color: #6c757d; margin-bottom: 40px; padding: 0 20px;">Khuyến
 			mãi đặc biệt - Tiết kiệm ngay hôm nay với giá giảm!</p>
 
-		<c:choose>
-			<c:when test="${not empty message}">
-				<div class="alert alert-success">
-					<i class="fa-solid fa-circle-check"></i>
-					<c:out value="${message}" />
-				</div>
-			</c:when>
-			<c:otherwise>
-				<div class="alert alert-error">
-					<i class="fa-solid fa-triangle-exclamation"></i>
-					<c:out value="${error}" />
-				</div>
-			</c:otherwise>
-		</c:choose>
+		<%-- Hiển thị thông báo thành công NẾU có --%>
+		<c:if test="${not empty message}">
+			<div class="alert alert-success">
+				<i class="fa-solid fa-circle-check"></i>
+				<c:out value="${message}" />
+			</div>
+		</c:if>
+
+		<%-- Hiển thị thông báo lỗi NẾU có --%>
+		<c:if test="${not empty error}">
+			<div class="alert alert-error">
+				<i class="fa-solid fa-triangle-exclamation"></i>
+				<c:out value="${error}" />
+			</div>
+		</c:if>
 
 
 		<div class="plans-container">
