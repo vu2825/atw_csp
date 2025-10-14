@@ -20,70 +20,6 @@ body {
 	padding: 0; /* Không padding để navbar sát top */
 }
 
-.navbar {
-	background: #f8f9fa;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 20px;
-	width: 100%;
-	box-sizing: border-box;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
-}
-
-.logo {
-	flex: 0 0 auto;
-}
-
-.logo-img {
-	height: 40px;
-	width: auto;
-}
-
-nav {
-	display: flex;
-	justify-content: center;
-	flex: 1;
-	gap: 20px;
-}
-
-nav a {
-	text-decoration: none;
-	color: #333;
-	font-weight: 500;
-	padding: 8px 12px;
-	border-radius: 4px;
-	transition: background-color 0.3s;
-}
-
-nav a:hover {
-	background-color: #e9ecef;
-	color: #007bff;
-}
-
-.nav-icons {
-	display: flex;
-	align-items: center;
-	gap: 15px;
-	flex: 0 0 auto;
-}
-
-.nav-icons i {
-	font-size: 18px;
-	color: #666;
-	cursor: pointer;
-	transition: color 0.3s;
-}
-
-.nav-icons i:hover {
-	color: #007bff;
-}
-
-.nav-icons a {
-	text-decoration: none;
-	color: inherit;
-}
-
 /* Nội dung pricing - Cách navbar */
 h1 {
 	text-align: center;
@@ -287,27 +223,42 @@ body.light-mode .plan-card {
 </style>
 </head>
 <body>
+	<c:set var="ctx" value="${pageContext.request.contextPath}" />
 	<header class="navbar">
-		<div class="logo">
-			<img src="images/Logo.png" alt="Logo" class="logo-img">
-		</div>
+		<div class="inner">
+			<a class="brand" href="${ctx}/"> <img
+				src="${ctx}/images/Logo.png" alt="Logo" class="logo-img" /> <span>HCMUTE</span>
+			</a>
 
-		<nav>
-			<a href="HomeServlet?action=TrangChu">Trang chủ</a> <a
-				href="HomeServlet?action=TheLoai">Thể loại</a> <a
-				href="HomeServlet?action=PhimBo">Phim bộ</a> <a
-				href="HomeServlet?action=PhimLe">Phim lẻ</a> <a
-				href="HomeServlet?action=QuocGia">Quốc gia</a>
-		</nav>
+			<nav class="nav" aria-label="Chính">
+				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> <a
+					href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a> <a
+					href="${ctx}/HomeServlet?action=PhimBo">Phim bộ</a> <a
+					href="${ctx}/HomeServlet?action=PhimLe">Phim lẻ</a> <a
+					href="${ctx}/HomeServlet?action=QuocGia">Quốc gia</a>
+			</nav>
 
-		<div class="nav-icons">
-			<i id="search-icon" class="fa-solid fa-magnifying-glass"></i> <i
-				class="fa-solid fa-bell"></i> <i class="fa-solid fa-bookmark"></i> <a
-				href="HomeServlet?action=GioHang"> <i
-				class="fa-solid fa-cart-shopping"></i>
-			</a> <a href="HomeServlet?action=TaiKhoan"> <i
-				class="fa-solid fa-user"></i>
-			</a> <i id="theme-toggle" class="fa-solid fa-sun"></i>
+			<div class="actions" aria-label="Tác vụ">
+				<form action="${ctx}/HomeServlet" method="get" class="search-form"
+					role="search" aria-label="Tìm phim">
+					<input type="hidden" name="action" value="TimKiem"> <input
+						type="text" name="query" class="search-input"
+						placeholder="Tìm phim..." />
+					<button type="submit" class="search-btn" aria-label="Tìm kiếm">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+				</form>
+
+				<i class="fa-solid fa-bell" aria-label="Thông báo"></i> <a
+					class="action-link" href="${ctx}/HomeServlet?action=watchlist"
+					aria-label="Watchlist"> <i class="fa-solid fa-bookmark"></i>
+				</a> <a class="action-link" href="${ctx}/Subscription.jsp"
+					aria-label="Giỏ hàng"> <i class="fa-solid fa-cart-shopping"></i>
+				</a> <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan"
+					aria-label="Tài khoản"> <i class="fa-solid fa-user"></i>
+				</a> <i id="theme-toggle" class="fa-solid fa-sun"
+					aria-label="Đổi giao diện sáng/tối"></i>
+			</div>
 		</div>
 	</header>
 

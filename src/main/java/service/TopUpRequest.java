@@ -4,12 +4,12 @@ import java.util.Date;
 import types.*;
 
 public class TopUpRequest {
-	public int id;
-	public int user_id;
-	public double amount;
-	public TopUpRequestTypes status;
-	public Date created_at;
-	public Date updated_at;
+	private int id;
+	private int user_id;
+	private double amount;
+	private TopUpRequestTypes status;
+	private Date created_at;
+	private Date updated_at;
 
 	public TopUpRequest(int id, int user_id, double amount, TopUpRequestTypes status, Date created_at, Date updated_at) {
 		super();

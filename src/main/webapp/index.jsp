@@ -40,7 +40,7 @@
   			<i class="fa-solid fa-bookmark"></i>
 		</a>
 
-        <a class="action-link" href="${ctx}/HomeServlet?action=GioHang" aria-label="Giỏ hàng">
+        <a class="action-link" href="${ctx}/Subscription.jsp" aria-label="Giỏ hàng">
           <i class="fa-solid fa-cart-shopping"></i>
         </a>
         <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan" aria-label="Tài khoản">

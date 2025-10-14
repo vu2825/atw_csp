@@ -1,13 +1,13 @@
 package bussines;
 
 public class User {
-	public int id;
-	public String username;
-	public String password;
-	public String email;
-	public double wallet;
-	public Boolean isPremium;
-	public Boolean isAdmin;
+	private int id;
+	private String username;
+	private String password;
+	private String email;
+	private double wallet;
+	private Boolean isPremium;
+	private Boolean isAdmin;
 	
 	public User(int id,String username,  String email, int wallet, Boolean isPremium, Boolean isAdmin){
 		this.id = id;

@@ -25,7 +25,7 @@ public class TopUpRequest extends HttpServlet {
 			UserDB userDB = new UserDB(dataSource);
 			List<service.TopUpRequest> topups = userDB.findAllTopupsOfUser(userId);
 			
-			req.setAttribute("topups", topups);
+			req.setAttribute("topups", topups) ;
 
 			String msg = req.getParameter("message");
 			if (msg != null && !msg.isEmpty()) {

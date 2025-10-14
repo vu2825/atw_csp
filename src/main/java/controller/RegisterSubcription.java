@@ -68,7 +68,7 @@ public class RegisterSubcription extends HttpServlet {
 			
 			UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
 
-			if(usersSubscriptionDB.checkSubscriptionUser(user.id)) {
+			if(usersSubscriptionDB.checkSubscriptionUser(user.getId())) {
 				req.setAttribute("message", "");
 				req.setAttribute("error", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
@@ -84,9 +84,9 @@ public class RegisterSubcription extends HttpServlet {
 				// created UserSubscription to added table user_subscription
 				UsersSubscription us = new UsersSubscription();
 
-				us.setId(user.id); // didn't use but must have value
+				us.setId(user.getId()); // didn't use but must have value
 
-				us.setUser_id(user.id);
+				us.setUser_id(user.getId());
 				us.setPlan(plan);
 				us.setPrice(planCost);
 
