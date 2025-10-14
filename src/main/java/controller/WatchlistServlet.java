@@ -1,7 +1,7 @@
 package controller;
 
 import data.WatchlistDAO;
-import model.Movie;
+import bussines.Movie;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;

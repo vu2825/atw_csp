@@ -1,6 +1,6 @@
 package data;
 
-import model.HistoryItem;
+import bussines.HistoryItem;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;

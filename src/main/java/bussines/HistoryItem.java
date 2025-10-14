@@ -10,10 +10,10 @@ public class HistoryItem {
   private int progressSeconds;
   private LocalDateTime lastWatchedAt;
 
+  // Khớp với SELECT trong DAO
   private String title;
-  private int year;
-  private String genre;
-  private String poster;
+  private String duration;   
+  private String videoUrl;  
 
   public int getId() { return id; }
   public void setId(int id) { this.id = id; }
@@ -33,14 +33,11 @@ public class HistoryItem {
   public String getTitle() { return title; }
   public void setTitle(String title) { this.title = title; }
 
-  public int getYear() { return year; }
-  public void setYear(int year) { this.year = year; }
+  public String getDuration() { return duration; }
+  public void setDuration(String duration) { this.duration = duration; }
 
-  public String getGenre() { return genre; }
-  public void setGenre(String genre) { this.genre = genre; }
-
-  public String getPoster() { return poster; }
-  public void setPoster(String poster) { this.poster = poster; }
+  public String getVideoUrl() { return videoUrl; }
+  public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
 
   public String getLastWatchedAtDisplay() {
     if (lastWatchedAt == null) return "";
