@@ -17,7 +17,7 @@ public class WatchlistDAO {
         "SELECT v.id AS vid, " +
         "       v.title AS vtitle, " +
         "       YEAR(v.published_at) AS vyear, " +
-        "       IFNULL(v.url_video_360P, v.url_video_480P) AS vsrc " + 
+        "       v.poster_url AS vsrc " + 
         "FROM thanh_toan.watchlist w " +
         "JOIN thanh_toan.videos v ON v.id = w.video_id " +
         "WHERE w.user_id = ? " +

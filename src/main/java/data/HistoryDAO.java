@@ -13,20 +13,18 @@ public class HistoryDAO {
         this.ds = ds;
     }
 
-    // =========================================================
-    // 1️⃣ Lấy lịch sử xem phim của 1 user
-    // =========================================================
+    // 1) Lấy lịch sử xem phim của 1 user
     public List<HistoryItem> findByUser(int userId) throws SQLException {
-        // SỬA Ở ĐÂY: Câu truy vấn đã được cập nhật
+        // LƯU Ý: Lấy poster_url để hiển thị ảnh poster
         String sql = """
-            SELECT h.id, 
-                   h.user_id, 
-                   h.video_id, 
-                   h.progress_seconds, 
+            SELECT h.id,
+                   h.user_id,
+                   h.video_id,
+                   h.progress_seconds,
                    h.last_watched_at,
-                   v.title, 
-                   v.duration, 
-                   COALESCE(v.url_video_360P, v.url_video_480P) AS video_url
+                   v.title,
+                   v.duration,
+                   v.poster_url AS poster_url
             FROM history h
             JOIN videos v ON v.id = h.video_id
             WHERE h.user_id = ?
@@ -36,7 +34,9 @@ public class HistoryDAO {
         List<HistoryItem> list = new ArrayList<>();
         try (Connection cn = ds.getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     HistoryItem h = new HistoryItem();
@@ -50,7 +50,9 @@ public class HistoryDAO {
 
                     h.setTitle(rs.getString("title"));
                     h.setDuration(rs.getString("duration"));
-                    h.setVideoUrl(rs.getString("video_url"));
+
+                    // ⭐ Quan trọng: map đúng alias "poster_url"
+                    h.setPosterUrl(rs.getString("poster_url"));
 
                     list.add(h);
                 }
@@ -59,9 +61,7 @@ public class HistoryDAO {
         return list;
     }
 
-    // =========================================================
-    // 2️⃣ Xoá lịch sử xem theo ID
-    // =========================================================
+    // 2) Xoá lịch sử xem theo ID
     public int deleteByIdForUser(int id, int userId) throws SQLException {
         String sql = "DELETE FROM history WHERE id = ? AND user_id = ?";
         try (Connection cn = ds.getConnection();
@@ -72,9 +72,7 @@ public class HistoryDAO {
         }
     }
 
-    // =========================================================
-    // 3️⃣ Thêm hoặc cập nhật tiến độ xem phim (Upsert)
-    // =========================================================
+    // 3) Thêm hoặc cập nhật tiến độ xem phim (Upsert)
     public void upsertProgress(int userId, int videoId, int progressSeconds) throws SQLException {
         String update = """
             UPDATE history 
@@ -95,7 +93,7 @@ public class HistoryDAO {
                 psU.setInt(3, videoId);
 
                 int n = psU.executeUpdate();
-                if (n == 0) { // nếu chưa có, chèn mới
+                if (n == 0) { // chưa có thì chèn mới
                     try (PreparedStatement psI = cn.prepareStatement(insert)) {
                         psI.setInt(1, userId);
                         psI.setInt(2, videoId);
