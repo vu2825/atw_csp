@@ -1,6 +1,6 @@
 package data;
 
-import model.Movie;
+import bussines.Movie;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;

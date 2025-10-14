@@ -1,7 +1,7 @@
 package controller;
 
 import data.HistoryDAO;
-import model.HistoryItem;
+import bussines.HistoryItem;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
