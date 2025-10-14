@@ -1,49 +1,54 @@
 package bussines;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-//anotation
+@WebServlet("/HomeServlet") // <- CHỈ map duy nhất đường này
 public class HomeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException ,ServletException{
+            throws IOException, ServletException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         String action = request.getParameter("action");
-        
-        String url = "/index.jsp";
-        if (action.equals("PhimBo")){
-            url="/PhimBo.jsp";
+        if (action == null) action = "TrangChu"; // tránh NPE
+
+        String url;
+        switch (action) {
+            case "PhimBo":
+                url = "/PhimBo.jsp";
+                break;
+            case "PhimLe":
+                url = "/PhimLe.jsp";
+                break;
+            case "QuocGia":
+                url = "/QuocGia.jsp";
+                break;
+            case "GioHang":
+                url = "/GioHang.jsp";
+                break;
+            case "TaiKhoan":
+                url = "/TaiKhoan.jsp";
+                break;
+            case "TrangChu":
+            default:
+                url = "/index.jsp";
+                break;
         }
-        if (action.equals("PhimLe")){
-            url="/PhimLe.jsp";
-        }
-        if (action.equals("QuocGia")){
-            url="/QuocGia.jsp";
-        }
-        if (action.equals("GioHang")){
-            url="/GioHang.jsp";
-        }
-        if (action.equals("TaiKhoan")){
-            url="/TaiKhoan.jsp";
-        }
-        
-        getServletContext().getRequestDispatcher(url).forward(request,response);
+
+        getServletContext().getRequestDispatcher(url).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws  IOException ,ServletException{
+            throws IOException, ServletException {
         doGet(request, response);
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

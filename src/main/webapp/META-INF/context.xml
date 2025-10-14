@@ -1,2 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/HomePageWeb"/>
+<Context path="/HomePageWeb">
+  <Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" initialSize="0" maxIdle="10" maxTotal="20" maxWaitMillis="10000" name="jdbc/loginDB" password="user1123@" testOnBorrow="false" testWhileIdle="false" type="javax.sql.DataSource" url="jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?sslMode=REQUIRED&amp;useUnicode=true&amp;characterEncoding=UTF-8" username="user1"/>
+</Context>
