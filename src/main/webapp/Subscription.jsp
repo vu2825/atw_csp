@@ -232,25 +232,19 @@ body.light-mode .plan-card {
 
 			<nav class="nav" aria-label="Chính">
 				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> <a
-					href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a> <a
-					href="${ctx}/HomeServlet?action=PhimBo">Phim bộ</a> <a
-					href="${ctx}/HomeServlet?action=PhimLe">Phim lẻ</a> <a
-					href="${ctx}/HomeServlet?action=QuocGia">Quốc gia</a>
+				<a href="${ctx}/TheLoaiServlet">Thể loại</a>
+                                <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
 			</nav>
 
 			<div class="actions" aria-label="Tác vụ">
-				<form action="${ctx}/HomeServlet" method="get" class="search-form"
-					role="search" aria-label="Tìm phim">
-					<input type="hidden" name="action" value="TimKiem"> <input
-						type="text" name="query" class="search-input"
-						placeholder="Tìm phim..." />
-					<button type="submit" class="search-btn" aria-label="Tìm kiếm">
-						<i class="fa-solid fa-magnifying-glass"></i>
-					</button>
-				</form>
+		        <form id="search-form" action="${pageContext.request.contextPath}/SearchServlet" method="get" class="search-form" role="search">
+                        <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+                        <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <ul id="suggestions" class="suggestions-list"></ul>
+                        </form>
 
 				<i class="fa-solid fa-bell" aria-label="Thông báo"></i> <a
-					class="action-link" href="${ctx}/HomeServlet?action=watchlist"
+					class="action-link" href="${ctx}/WatchlistServlet"
 					aria-label="Watchlist"> <i class="fa-solid fa-bookmark"></i>
 				</a> <a class="action-link" href="${ctx}/Subscription.jsp"
 					aria-label="Giỏ hàng"> <i class="fa-solid fa-cart-shopping"></i>
@@ -374,5 +368,56 @@ body.light-mode .plan-card {
             localStorage.setItem("theme", isLight ? "light" : "dark");
         });
     </script>
+    
+    <script>
+        const input = document.getElementById("search-input");
+        const suggestionsList = document.getElementById("suggestions");
+
+        input.addEventListener("input", () => {
+            const query = input.value.trim();
+            suggestionsList.classList.remove("show");
+            suggestionsList.innerHTML = ""; 
+            if (query.length === 0) return;
+
+            const url = "${ctx}/SearchServlet?action=suggest&query=" + encodeURIComponent(query);
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network error: " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Dữ liệu gợi ý:", data); 
+                    suggestionsList.innerHTML = ""; 
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(title => {
+                            const li = document.createElement("li");
+                            li.textContent = title || "Không có tiêu đề"; 
+                            suggestionsList.appendChild(li);
+                        });
+                        suggestionsList.classList.add("show");
+                    } else {
+                        const li = document.createElement("li");
+                        li.textContent = "Không có gợi ý";
+                        suggestionsList.appendChild(li);
+                        suggestionsList.classList.add("show");
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi fetch gợi ý:", error);
+                    suggestionsList.innerHTML = `<li>Lỗi: ${error.message}</li>`;
+                    suggestionsList.classList.add("show");
+                });
+        });
+
+        suggestionsList.addEventListener("click", e => {
+            if (e.target.tagName === "LI") {
+                input.value = e.target.textContent;
+                suggestionsList.classList.remove("show");
+                suggestionsList.innerHTML = "";
+                document.getElementById("search-form").submit();
+            }
+        });
+ </script>
+    
 </body>
 </html>

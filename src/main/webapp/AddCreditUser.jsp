@@ -257,11 +257,9 @@ body:not(.light-mode) .amount-input:focus {
 		</div>
 
 		<nav>
-			<a href="HomeServlet?action=TrangChu">Trang chủ</a> <a
-				href="HomeServlet?action=TheLoai">Thể loại</a> <a
-				href="HomeServlet?action=PhimBo">Phim bộ</a> <a
-				href="HomeServlet?action=PhimLe">Phim lẻ</a> <a
-				href="HomeServlet?action=QuocGia">Quốc gia</a>
+			<a href="HomeServlet?action=TrangChu">Trang chủ</a>
+		        <a href="${ctx}/TheLoaiServlet">Thể loại</a>
+                        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
 		</nav>
 
 		<div class="nav-icons">

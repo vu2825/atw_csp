@@ -161,5 +161,56 @@
       });
     })();
   </script>
+  
+  <script>
+        const input = document.getElementById("search-input");
+        const suggestionsList = document.getElementById("suggestions");
+
+        input.addEventListener("input", () => {
+            const query = input.value.trim();
+            suggestionsList.classList.remove("show");
+            suggestionsList.innerHTML = ""; 
+            if (query.length === 0) return;
+
+            const url = "${ctx}/SearchServlet?action=suggest&query=" + encodeURIComponent(query);
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network error: " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Dữ liệu gợi ý:", data); 
+                    suggestionsList.innerHTML = ""; 
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(title => {
+                            const li = document.createElement("li");
+                            li.textContent = title || "Không có tiêu đề"; 
+                            suggestionsList.appendChild(li);
+                        });
+                        suggestionsList.classList.add("show");
+                    } else {
+                        const li = document.createElement("li");
+                        li.textContent = "Không có gợi ý";
+                        suggestionsList.appendChild(li);
+                        suggestionsList.classList.add("show");
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi fetch gợi ý:", error);
+                    suggestionsList.innerHTML = `<li>Lỗi: ${error.message}</li>`;
+                    suggestionsList.classList.add("show");
+                });
+        });
+
+        suggestionsList.addEventListener("click", e => {
+            if (e.target.tagName === "LI") {
+                input.value = e.target.textContent;
+                suggestionsList.classList.remove("show");
+                suggestionsList.innerHTML = "";
+                document.getElementById("search-form").submit();
+            }
+        });
+ </script>
+  
 </body>
 </html>
