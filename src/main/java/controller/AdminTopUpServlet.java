@@ -1,8 +1,10 @@
 package controller;
 
 import data.TopUpDB;
+import data.UserDB;
 import types.TopUpRequestTypes;
 import bussines.TopUp;
+import bussines.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -14,7 +16,7 @@ import java.util.List;
 @WebServlet("/AdminTopUpServlet")
 public class AdminTopUpServlet extends HttpServlet {
 
-	@Resource(name = "jdbc/MySQLDB")
+	@Resource(name = "jdbc/loginDB")
 	private DataSource ds;
 
 	@Override
@@ -41,36 +43,46 @@ public class AdminTopUpServlet extends HttpServlet {
 			switch (action) {
 			case "ACCEPT":
 			case "DISCARD": {
-				int id = Integer.parseInt(request.getParameter("id"));
+				int topupId = Integer.parseInt(request.getParameter("id"));
 				TopUpRequestTypes st = TopUpRequestTypes.valueOf(action);
-				boolean ok = topUpDB.updateStatusIfPending(id, st);
-				String url = request.getContextPath() + "/AdminTopUpServlet";
-				if (!ok) {
-					response.sendRedirect(url + "?error=" + enc("Yêu cầu #" + id + " không còn pending"));
+
+				// 1) Lấy topup để biết userId & amount
+				TopUp topup = new TopUpDB(ds).getById(topupId);
+				if (topup == null) {
+					response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?error="
+							+ enc("Không tìm thấy yêu cầu #" + topupId));
 					return;
 				}
-				response.sendRedirect(
-						url + "?message=" + enc((action.equals("ACCEPT") ? "Đã duyệt " : "Đã từ chối ") + "#" + id));
-				return;
-			}
-			case "BulkAction": {
-				TopUpRequestTypes st = TopUpRequestTypes.valueOf(request.getParameter("bulkType"));
-				String[] ids = request.getParameterValues("ids");
-				int ok = 0, fail = 0;
-				if (ids != null) {
-					for (String s : ids) {
-						int id = Integer.parseInt(s);
-						if (topUpDB.updateStatusIfPending(id, st))
-							ok++;
-						else
-							fail++;
-					}
+
+				// 2) Cập nhật trạng thái nếu còn pending
+				boolean ok = new TopUpDB(ds).updateStatusIfPending(topupId, st);
+				if (!ok) {
+					response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?error="
+							+ enc("Yêu cầu #" + topupId + " không còn pending"));
+					return;
 				}
-				response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?ok=" + ok + "&fail=" + fail);
+
+				// 3) Nếu ACCEPT thì cộng ví bằng updateWallet
+				if (st == TopUpRequestTypes.ACCEPT) {
+					UserDB userDB = new UserDB(ds);
+					User user = userDB.getUserById(topup.getUserId());
+					if (user == null) {
+						response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?error="
+								+ enc("Không tìm thấy user #" + topup.getUserId()));
+						return;
+					}
+					double newWallet = user.getWallet() + topup.getAmount();
+					userDB.updateWallet(newWallet, user.getId());
+				}
+
+				// 4) PRG
+				String msg = (st == TopUpRequestTypes.ACCEPT ? "Đã duyệt " : "Đã từ chối ") + "#" + topupId;
+				response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?message=" + enc(msg));
 				return;
 			}
+
 			default:
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
+response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

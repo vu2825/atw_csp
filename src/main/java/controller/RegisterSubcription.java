@@ -22,7 +22,7 @@ import types.SubscriptionStatus;
 
 @WebServlet("/RegisterSubscription")
 public class RegisterSubcription extends HttpServlet {
-	@Resource(name = "jdbc/MySQLDB") // Inject DataSource từ JNDI
+    @Resource(name = "jdbc/loginDB") // Inject DataSource từ JNDI
 	private DataSource dataSource;
 	double oneMonth = 9.99;
 	double sixMonth = 49.99;

@@ -15,15 +15,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/TopUpRequest")
 public class TopUpRequest extends HttpServlet {
-	@Resource(name = "jdbc/MySQLDB")
+	@Resource(name = "jdbc/loginDB")
 	private DataSource dataSource;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		int userId = 1; // TODO: get from session/auth
+		int userId = 3; // TODO: get from session/auth
 		try {
 			UserDB userDB = new UserDB(dataSource);
 			List<service.TopUpRequest> topups = userDB.findAllTopupsOfUser(userId);
+			
 			req.setAttribute("topups", topups);
 
 			String msg = req.getParameter("message");
@@ -51,7 +52,7 @@ public class TopUpRequest extends HttpServlet {
 					return;
 				}
 
-				int userId = 1; // TODO: from session/auth
+				int userId = 3; // TODO: from session/auth
 				UserDB userDB = new UserDB(dataSource);
 				userDB.sendAddCredit(amount, userId);
 

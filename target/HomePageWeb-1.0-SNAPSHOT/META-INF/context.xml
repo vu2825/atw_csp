@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/HomePageWeb"/>
+<Context path="/HomePageWeb">
+  <Resource
+      name="jdbc/loginDB"
+      auth="Container"
+      type="javax.sql.DataSource"
+      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+      driverClassName="com.mysql.cj.jdbc.Driver"
+      url="jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?sslMode=REQUIRED&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+      username="user1"
+      password="user1123@"
+      maxTotal="20"
+      maxIdle="10"
+      maxWaitMillis="10000"
+      testOnBorrow="false"
+      testWhileIdle="false"
+  />
+</Context>

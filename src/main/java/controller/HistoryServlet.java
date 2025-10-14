@@ -1,7 +1,7 @@
 package controller;
 
 import data.HistoryDAO;
-import model.HistoryItem;
+import bussines.HistoryItem;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
@@ -18,7 +18,7 @@ import java.util.List;
 public class HistoryServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  @Resource(name = "jdbc/MySQLDB")  // 🔁 Đảm bảo khớp context.xml
+  @Resource(name = "jdbc/loginDB")  // 🔁 Đảm bảo khớp context.xml
   private DataSource ds;
 
   private HistoryDAO historyDAO;

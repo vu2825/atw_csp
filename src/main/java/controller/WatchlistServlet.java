@@ -1,7 +1,7 @@
 package controller;
 
 import data.WatchlistDAO;
-import model.Movie;
+import bussines.Movie;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
@@ -18,14 +18,14 @@ import java.util.List;
 @WebServlet("/watchlist")
 public class WatchlistServlet extends HttpServlet {
 
-  @Resource(name = "jdbc/MySQLDB")
+  @Resource(name = "jdbc/loginDB")
   private DataSource ds;
 
   private WatchlistDAO watchlistDAO;
 
   @Override
   public void init() throws ServletException {
-    if (ds == null) throw new ServletException("DataSource jdbc/MySQLDB chưa cấu hình");
+    if (ds == null) throw new ServletException("DataSource jdbc/loginDB chưa cấu hình");
     watchlistDAO = new WatchlistDAO(ds);
   }
 

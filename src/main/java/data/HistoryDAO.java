@@ -1,6 +1,6 @@
 package data;
 
-import model.HistoryItem;
+import bussines.HistoryItem;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,14 +17,15 @@ public class HistoryDAO {
     // 1️⃣ Lấy lịch sử xem phim của 1 user
     // =========================================================
     public List<HistoryItem> findByUser(int userId) throws SQLException {
-        String sql = """
-            SELECT h.id, h.user_id, h.video_id, h.progress_seconds, h.last_watched_at,
-                   v.title, v.duration, COALESCE(v.url_video_360P, v.url_video_480P, v.url_video) AS video_url
-            FROM history h
-            JOIN videos v ON v.id = h.video_id
-            WHERE h.user_id = ?
-            ORDER BY h.last_watched_at DESC
-        """;
+        String sql;
+        sql = """
+                  SELECT h.id, h.user_id, h.video_id, h.progress_seconds, h.last_watched_at,
+                         v.title, v.duration, COALESCE(v.url_video_360P, v.url_video_480P, v.url_video) AS video_url
+                  FROM history h
+                  JOIN videos v ON v.id = h.video_id
+                  WHERE h.user_id = ?
+                  ORDER BY h.last_watched_at DESC
+              """;
 
         List<HistoryItem> list = new ArrayList<>();
         try (Connection cn = ds.getConnection();
