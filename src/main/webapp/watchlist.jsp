@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Watchlist</title>
 
-  <!-- CSS dự án -->
+  <!-- CSS giao diện -->
   <link rel="stylesheet" href="<c:url value='/styles/test.css'/>" />
 
   <!-- Font Awesome -->
@@ -17,7 +17,7 @@
 
   <!-- Giữ theme đã lưu trước khi render -->
   <script>
-    (function(){
+    (function () {
       var saved = localStorage.getItem('theme');
       if (saved === 'dark') document.documentElement.classList.add('dark');
     })();
@@ -27,49 +27,12 @@
 <body>
   <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
-  <!-- ===== NAVBAR ===== -->
-  <header class="navbar">
-    <div class="inner">
-      <a class="brand" href="${ctx}/">
-        <img src="${ctx}/images/Logo.png" alt="Logo" class="logo-img" />
-        <span>HCMUTE</span>
-      </a>
+  <!-- Nút đổi theme nổi (không có topbar) -->
+  <button id="theme-toggle" class="theme-fab" aria-label="Đổi giao diện sáng/tối" title="Đổi giao diện">
+    <i class="fa-solid fa-sun"></i>
+  </button>
 
-      <nav class="nav" aria-label="Chính">
-        <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
-        <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
-        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
-      </nav>
-
-      <div class="actions" aria-label="Tác vụ">
-        <form action="${ctx}/HomeServlet" method="get" class="search-form" role="search" aria-label="Tìm phim">
-          <input type="hidden" name="action" value="TimKiem">
-          <input type="text" name="query" class="search-input" placeholder="Tìm phim..." />
-          <button type="submit" class="search-btn" aria-label="Tìm kiếm">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </form>
-
-        <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
-
-        <!-- Đi qua servlet /watchlist -->
-        <a class="action-link" href="${ctx}/watchlist" aria-label="Watchlist">
-          <i class="fa-solid fa-bookmark"></i>
-        </a>
-
-        <a class="action-link" href="${ctx}/HomeServlet?action=GioHang" aria-label="Giỏ hàng">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </a>
-        <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan" aria-label="Tài khoản">
-          <i class="fa-solid fa-user"></i>
-        </a>
-
-        <i id="theme-toggle" class="fa-solid fa-sun" aria-label="Đổi giao diện sáng/tối"></i>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== NỘI DUNG CHÍNH ===== -->
+  <!-- NỘI DUNG CHÍNH -->
   <main class="container">
     <h1>Watchlist của bạn</h1>
 
@@ -82,6 +45,7 @@
       </c:choose>
     </div>
 
+    <!-- Thanh công cụ -->
     <c:if test="${not empty watchlist}">
       <div class="toolbar">
         <strong>Watchlist</strong>
@@ -102,10 +66,19 @@
     <c:if test="${not empty watchlist}">
       <section id="movieGrid" class="grid">
         <c:forEach var="m" items="${watchlist}">
+          <!-- Lấy id phim (hỗ trợ cả m.id hoặc m.vid) -->
+          <c:set var="mid" value="${empty m.id ? m.vid : m.id}"/>
+          <!-- Lấy ảnh poster (ưu tiên m.src, sau đó m.poster_url) -->
+          <c:set var="poster" value="${empty m.src ? m.poster_url : m.src}"/>
+          <!-- Lấy năm phát hành (hỗ trợ m.year / m.vyear) -->
+          <c:set var="y" value="${empty m.year ? m.vyear : m.year}"/>
+
           <article class="card">
             <c:choose>
-              <c:when test="${not empty m.src}">
-                <img class="poster" src="${m.src}" alt="${m.title}" />
+              <c:when test="${not empty poster}">
+                <a class="poster-link" href="${ctx}/watch?videoId=${mid}" title="${m.title}">
+                  <img class="poster" src="${poster}" alt="${m.title}" />
+                </a>
               </c:when>
               <c:otherwise>
                 <div class="no-poster">Không có ảnh</div>
@@ -114,13 +87,19 @@
 
             <div class="meta">
               <p class="title">${m.title}</p>
-              <p class="year">Năm: ${m.year}</p>
+              <c:if test="${not empty y}">
+                <span class="year">${y}</span>
+              </c:if>
 
-              <form action="${ctx}/watchlist" method="post">
-                <input type="hidden" name="action" value="remove"/>
-                <input type="hidden" name="videoId" value="${m.id}"/>
-                <button class="btn danger" type="submit">Xóa</button>
-              </form>
+              <div class="actions-row">
+                <form action="${ctx}/watchlist" method="post">
+                  <input type="hidden" name="action" value="remove"/>
+                  <input type="hidden" name="videoId" value="${mid}"/>
+                  <button class="btn danger" type="submit">
+                    <i class="fa-solid fa-trash"></i> Xóa
+                  </button>
+                </form>
+              </div>
             </div>
           </article>
         </c:forEach>
@@ -128,57 +107,54 @@
     </c:if>
   </main>
 
-  <!-- ===== SCRIPT: Theme + Sắp xếp ===== -->
+  <!-- JS: toggle theme + sắp xếp client-side -->
   <script>
+    // Helper đặt icon theo trạng thái hiện tại
+    function setFabIcon(btn){
+      btn.innerHTML = document.documentElement.classList.contains('dark')
+        ? '<i class="fa-solid fa-sun"></i>'     // đang Dark -> hiện Sun
+        : '<i class="fa-solid fa-moon"></i>';   // đang Light -> hiện Moon
+    }
+
     // Toggle theme
-    (function () {
-      const toggle = document.getElementById('theme-toggle');
-      const root = document.documentElement;
+    (function(){
+      var btn = document.getElementById('theme-toggle');
+      if(!btn) return;
+      setFabIcon(btn); // đồng bộ icon khi load
 
-      function syncIcon() {
-        if (root.classList.contains('dark')) {
-          toggle.classList.remove('fa-sun'); toggle.classList.add('fa-moon');
-        } else {
-          toggle.classList.remove('fa-moon'); toggle.classList.add('fa-sun');
-        }
-      }
-      syncIcon();
-
-      toggle?.addEventListener('click', () => {
-        const isDark = root.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        syncIcon();
+      btn.addEventListener('click', function () {
+        var html = document.documentElement;
+        var willDark = !html.classList.contains('dark');
+        html.classList.toggle('dark', willDark);
+        localStorage.setItem('theme', willDark ? 'dark' : 'light');
+        setFabIcon(btn);
       });
     })();
 
-    // Sắp xếp client-side
-    (function (){
-      const sortSelect = document.getElementById('sortSelect');
-      const grid = document.getElementById('movieGrid');
-      if (!sortSelect || !grid) return;
+    // Sort A-Z / Z-A (client-side)
+    (function () {
+      var select = document.getElementById('sortSelect');
+      var grid = document.getElementById('movieGrid');
+      if (!select || !grid) return;
 
-      sortSelect.addEventListener('change', () => {
-        const cards = Array.from(grid.querySelectorAll('.card'));
-        const type = sortSelect.value;
-
-        if (type === 'az') {
-          cards.sort((a, b) =>
-            a.querySelector('.title').textContent
-              .localeCompare(b.querySelector('.title').textContent, 'vi', {sensitivity:'base'})
-          );
-        } else if (type === 'za') {
-          cards.sort((a, b) =>
-            b.querySelector('.title').textContent
-              .localeCompare(a.querySelector('.title').textContent, 'vi', {sensitivity:'base'})
-          );
-        } else {
-          // newest: reload để giữ thứ tự theo SQL (added_at DESC)
-          location.reload();
+      var originalOrder = Array.from(grid.children);
+      select.addEventListener('change', function () {
+        var val = this.value;
+        if (val === 'newest') {
+          grid.innerHTML = '';
+          originalOrder.forEach(function (el) { grid.appendChild(el); });
           return;
         }
-
+        var cards = Array.from(grid.children);
+        cards.sort(function (a, b) {
+          var ta = a.querySelector('.title')?.textContent.trim().toLowerCase() || '';
+          var tb = b.querySelector('.title')?.textContent.trim().toLowerCase() || '';
+          if (val === 'az') return ta.localeCompare(tb, 'vi');
+          if (val === 'za') return tb.localeCompare(ta, 'vi');
+          return 0;
+        });
         grid.innerHTML = '';
-        cards.forEach(card => grid.appendChild(card));
+        cards.forEach(function (el) { grid.appendChild(el); });
       });
     })();
   </script>

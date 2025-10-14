@@ -50,6 +50,12 @@ public class HistoryServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");    // (tùy chọn)
+    
+    HttpSession session = req.getSession(false);
+	  Object uid = (session != null) ? session.getAttribute("userId") : null;
+	  System.out.println("🔍 WatchlistServlet: userId trong session = " + uid);
+	  
+	  
     int userId = getUserId(req);
     try {
       List<HistoryItem> list = historyDAO.findByUser(userId);

@@ -36,7 +36,7 @@
         </form>
 
         <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
-        <a class="action-link" href="${ctx}/HomeServlet?action=watchlist" aria-label="Watchlist">
+        <a class="action-link" href="${ctx}/watchlist" aria-label="Watchlist">
   			<i class="fa-solid fa-bookmark"></i>
 		</a>
 

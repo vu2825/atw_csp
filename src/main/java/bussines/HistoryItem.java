@@ -10,10 +10,14 @@ public class HistoryItem {
   private int progressSeconds;
   private LocalDateTime lastWatchedAt;
 
-  // Khớp với SELECT trong DAO
   private String title;
-  private String duration;   
-  private String videoUrl;  
+  private String duration;
+
+  // Dùng để hiển thị ảnh poster
+  private String posterUrl;
+
+  // (Tuỳ chọn) Nếu sau này muốn hiển thị nguồn video
+  private String videoUrl;
 
   public int getId() { return id; }
   public void setId(int id) { this.id = id; }
@@ -35,6 +39,9 @@ public class HistoryItem {
 
   public String getDuration() { return duration; }
   public void setDuration(String duration) { this.duration = duration; }
+
+  public String getPosterUrl() { return posterUrl; }
+  public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
   public String getVideoUrl() { return videoUrl; }
   public void setVideoUrl(String videoUrl) { this.videoUrl = videoUrl; }
