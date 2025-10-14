@@ -57,38 +57,4 @@ public class UsersSubscriptionDB {
 		}
 	}
 
-	public UsersSubscription getSubscriptionForUser(int userId) {
-		UsersSubscription s = null;
-		String sql = "SELECT id,user_id,plan,price_cents,started_at,expires_at,status,created_at,updated_at "
-				+ "FROM users_subscription WHERE user_id=? AND status='active' LIMIT 1";
-		try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, userId);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					s = new UsersSubscription();
-					s.setId(rs.getInt("id"));
-					s.setUser_id(rs.getInt("user_id"));
-					s.setPlan(rs.getString("plan"));
-
-					double cents = rs.getDouble("price");
-					s.setPrice(cents);
-
-					Timestamp st = rs.getTimestamp("started_at");
-					Timestamp ex = rs.getTimestamp("expires_at");
-					if (st != null)
-						s.setStarted_at(new java.util.Date(st.getTime()));
-					if (ex != null)
-						s.setExpires_at(new java.util.Date(ex.getTime()));
-
-					s.setStatus(SubscriptionStatus.fromDb(rs.getString("status")));
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return s;
-	}
-	
-	
-
 }
