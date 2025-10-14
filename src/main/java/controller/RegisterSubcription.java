@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.UsersSubscription;
 import types.SubscriptionStatus;
 
-@WebServlet("/RegisterSubcription")
+@WebServlet("/RegisterSubscription")
 public class RegisterSubcription extends HttpServlet {
 	@Resource(name = "jdbc/MySQLDB") // Inject DataSource từ JNDI
 	private DataSource dataSource;

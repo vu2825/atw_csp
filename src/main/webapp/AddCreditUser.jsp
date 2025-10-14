@@ -12,7 +12,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- Styles nội bộ ứng dụng -->
-<link rel="stylesheet" href="<c:url value='/styles/style.css'/>">
+<link rel="stylesheet" href="/styles/style.css'/>">
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -227,6 +227,9 @@ body:not(.light-mode) .amount-input {
 body:not(.light-mode) .amount-input:focus {
 	border-color: #60a5fa;
 	box-shadow: 0 0 0 3px rgba(37, 99, 235, .35);
+}
+.logo-img{
+	width: 40px;
 }
 
 /* Responsive */

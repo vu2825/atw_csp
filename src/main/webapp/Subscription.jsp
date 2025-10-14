@@ -336,7 +336,7 @@ body.light-mode .plan-card {
 
 		<div class="plans-container">
 			<!-- Gói 1 Tháng -->
-			<form action="RegisterSubcription" method="POST">
+			<form action="RegisterSubscription" method="POST">
 				<input class="hidden" name="plan" value="oneMonth" />
 				<div class="plan-card">
 					<div class="save-badge">Tiết kiệm 20%</div>
@@ -357,7 +357,7 @@ body.light-mode .plan-card {
 			</form>
 
 			<!-- Gói 6 Tháng -->
-			<form action="RegisterSubcription" method="POST">
+			<form action="RegisterSubscription" method="POST">
 				<input class="hidden" name="plan" value="sixMonth" />
 				<div class="plan-card">
 					<div class="save-badge">Tiết kiệm 25%</div>
@@ -380,7 +380,7 @@ body.light-mode .plan-card {
 
 
 			<!-- Gói 1 Năm -->
-			<form action="RegisterSubcription" method="POST">
+			<form action="RegisterSubscription" method="POST">
 				<input class="hidden" name="plan" value="twelveMonth" />
 				<div class="plan-card">
 					<div class="save-badge">Tiết kiệm 30%</div>

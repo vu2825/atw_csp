@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/HomePageWeb"/>
+<Context>
+    <Resource name="jdbc/MySQLDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="100"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="user1"
+              password="user1123@"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?useSSL=true&amp;requireSSL=true&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true" />
+</Context>
