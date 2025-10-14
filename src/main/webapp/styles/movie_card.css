@@ -1,0 +1,148 @@
+/* ========================================
+   🎬 DANH SÁCH PHIM - GIAO DIỆN NỀN TRẮNG
+   ======================================== */
+
+/* Tổng thể trang */
+body {
+  background-color: #ffffff; /* ✅ Nền trắng */
+  color: #000; /* ✅ Chữ đen */
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container chứa toàn bộ danh sách */
+.movie-list {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Nếu không có phim */
+.movie-list p {
+  text-align: center;
+  font-size: 16px;
+  color: #777;
+  margin-top: 20px;
+}
+
+/* Lưới hiển thị phim - 4 cột mỗi hàng */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* ✅ Tối đa 4 phim mỗi hàng */
+  gap: 30px;
+  justify-items: center;
+  margin-top: 25px;
+}
+
+/* Thẻ phim */
+.movie-card {
+  width: 300px;
+  height: 600px;
+  background-color: #fff; /* ✅ Màu nền trắng */
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-align: center;
+}
+
+.movie-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+/* Ảnh phim */
+.movie-card img {
+  width: 300px;
+  height: 450px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Nội dung phía dưới ảnh */
+.movie-card-content {
+  padding: 10px 8px 16px;
+}
+
+.movie-card-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  margin: 6px 0 4px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.movie-card-content p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Nút xem phim */
+.movie-card-content .btn {
+  display: inline-block;
+  background-color: #2563eb; /* ✅ Xanh dương nổi bật */
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.movie-card-content .btn:hover {
+  background-color: #1e50d8;
+  transform: scale(1.05);
+}
+
+/* ========================================
+   🎚️ Bộ lọc thể loại (dropdown)
+   ======================================== */
+.genre-filter {
+  text-align: center;
+  margin: 25px 0 10px;
+}
+
+.genre-filter label {
+  font-weight: 600;
+  margin-right: 10px;
+  color: #333;
+}
+
+.genre-filter select {
+  padding: 8px 14px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f9;
+  color: #000;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.genre-filter select:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.3);
+}
+
+/* Giữ nút navbar màu hài hòa với nền trắng */
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.navbar a {
+  color: #333;
+}
+
+.navbar a:hover,
+.navbar a.active {
+  color: #2563eb;
+}

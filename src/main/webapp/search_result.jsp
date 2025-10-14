@@ -5,12 +5,14 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Xem Phim Online</title>
+    <title>Kết quả tìm kiếm</title>
     <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/movie_card.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
  <header class="navbar">
     <div class="inner">
       <a class="brand" href="${ctx}/">
@@ -25,11 +27,12 @@
       </nav>
 
       <div class="actions" aria-label="Tác vụ">
-         <form id="search-form" action="${pageContext.request.contextPath}/SearchServlet" method="get" class="search-form" role="search">
-             <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
-             <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-             <ul id="suggestions" class="suggestions-list"></ul>
+        <form id="search-form" action="${pageContext.request.contextPath}/SearchServlet" method="get" class="search-form" role="search">
+        <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+        <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <ul id="suggestions" class="suggestions-list"></ul>
         </form>
+
         <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
         <a class="action-link" href="${ctx}/WatchlistServlet" aria-label="Watchlist">
   			<i class="fa-solid fa-bookmark"></i>
@@ -47,46 +50,26 @@
     </div>
   </header>
 
-<section class="feature">
-    <div class="feature-content">
-        <h1>${featuredMovie.title}</h1>
-        <p>${featuredMovie.description}</p>
-        <div class="feature-buttons">
-            <a href="${featuredMovie.watchLink}" class="btn watch">▶ Watch Movie</a>
-            <a href="${featuredMovie.infoLink}" class="btn info">More Info →</a>
-        </div>
+<section class="movie-list">
+    <h2>Kết quả tìm kiếm cho: "${query}"</h2>
+
+    <c:if test="${empty results}">
+        <p>Không tìm thấy phim nào phù hợp.</p>
+    </c:if>
+
+    <div class="movie-grid">
+        <c:forEach var="v" items="${results}">
+            <div class="movie-card">
+                <img src="${v.posterUrl}" alt="${v.title}" class="movie-img">
+                <div class="movie-card-content">
+                    <h3>${v.title}</h3>
+                    <p>${v.genre}</p>
+                    <a href="${v.urlVideo480p}" target="_blank" class="btn">Xem ngay</a>
+                </div>
+            </div>
+        </c:forEach>
     </div>
-    <img src="${featuredMovie.image}" alt="${featuredMovie.title}" class="feature-bg">
 </section>
-
-<script>
-  const toggle = document.getElementById("theme-toggle");
-  const root = document.documentElement; 
-
-  // Mặc định: LIGHT (không có .dark)
-  const saved = localStorage.getItem("theme");
-  if (saved === "dark") {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark"); 
-  }
-
-  // Cập nhật icon
-  const updateIcon = () => {
-    const isDark = root.classList.contains("dark");
-    toggle.classList.toggle("fa-sun", !isDark); 
-    toggle.classList.toggle("fa-moon", isDark); 
-  };
-  updateIcon();
-
-  // Toggle
-  toggle.addEventListener("click", () => {
-    root.classList.toggle("dark");
-    const isDark = root.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-    updateIcon();
-  });
-</script>
 
 <script>
         const input = document.getElementById("search-input");
@@ -137,6 +120,5 @@
             }
         });
  </script>
-
 </body>
 </html>

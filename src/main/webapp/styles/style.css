@@ -1,120 +1,105 @@
-/* ===============================
-   THEME (Default = LIGHT)
-   =============================== */
 :root {
-  --bg:#f6f7fb;
-  --text:#111827;
-  --muted:#6b7280;
-
-  --card:#ffffff;
-  --border:#e5e7eb;
-
-  --accent:#2563eb;
-  --danger:#ef4444;
-
-  --icon:#c9cdd3;        /* xám nhạt cho icon */
-  --icon-hover:#2563eb;  /* màu hover */
-
-  --search-bg:#f1f2f4;   /* nền ô tìm kiếm */
-  --search-border:#eceff3;
+  --bg: #f6f7fb;
+  --text: #111827;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --danger: #ef4444;
+  --icon: #c9cdd3;
+  --icon-hover: #2563eb;
+  --search-bg: #f1f2f4;
+  --search-border: #eceff3;
 }
 
 :root.dark {
-  --bg:#0b0b0b;
-  --text:#e5e7eb;
-  --muted:#9aa1ad;
-
-  --card:#111827;
-  --border:#1f2937;
-
-  --accent:#2563eb;
-  --danger:#ef4444;
-
-  --icon:#a5acb8;
-  --icon-hover:#93b4ff;
-
-  --search-bg:#1f2430;
-  --search-border:#2a2f3a;
+  --bg: #0b0b0b;
+  --text: #e5e7eb;
+  --muted: #9aa1ad;
+  --card: #111827;
+  --border: #1f2937;
+  --accent: #2563eb;
+  --danger: #ef4444;
+  --icon: #a5acb8;
+  --icon-hover: #93b4ff;
+  --search-bg: #1f2430;
+  --search-border: #2a2f3a;
 }
 
-/* ===============================
-   BASE
-   =============================== */
-*{ box-sizing:border-box; margin:0; padding:0; }
-html, body { min-height: 100%; }
-
-body{
-  background:var(--bg);
-  color:var(--text);
-  font:15px/1.5 "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  min-height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
   transition: background .25s ease, color .25s ease;
 }
 
-/* ===============================
-   NAVBAR (TOPBAR)
-   =============================== */
-.navbar{
+.navbar {
   position: sticky;
   top: 0;
   z-index: 50;
   background: var(--card);
   border-bottom: 1px solid var(--border);
 }
-.navbar .inner{
+.navbar .inner {
   max-width: 1300px;
   margin: 0 auto;
   padding: 12px 24px;
   display: grid;
-  grid-template-columns: auto 1fr auto; /* logo | nav | actions */
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 24px;
 }
 
-/* === BRAND === */
-.brand{
+.brand {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: var(--accent);
 }
-.brand img{
+.brand img {
   height: clamp(48px, 5vw, 56px);
   width: auto;
   display: block;
 }
-.brand span{
+.brand span {
   font-weight: 800;
   font-size: 18px;
   letter-spacing: .3px;
   color: var(--accent);
 }
 
-/* === NAV (menu giữa) === */
-.nav{
+.nav {
   display: flex;
   justify-content: center;
   gap: 46px;
 }
-.nav a{
+.nav a {
   color: var(--text);
   text-decoration: none;
   font-weight: 600;
   font-size: 16px;
   transition: color .2s ease;
 }
-.nav a:hover{ color: var(--accent); }
-.nav a.active{ color: var(--accent); }
+.nav a:hover { color: var(--accent); }
+.nav a.active { color: var(--accent); }
 
-/* === ACTIONS (phần phải) === */
-.actions{
+.actions {
   display: flex;
   align-items: center;
   justify-self: end;
   gap: 18px;
 }
 .actions i,
-.actions a{
+.actions a {
   color: var(--icon);
   font-size: 18px;
   text-decoration: none;
@@ -125,13 +110,12 @@ body{
   transition: color .15s ease, transform .15s ease;
 }
 .actions i:hover,
-.actions a:hover i{
+.actions a:hover i {
   color: var(--icon-hover);
   transform: translateY(-1px);
 }
 
-/* === SEARCH FORM === */
-.search-form{
+.search-form {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -140,17 +124,23 @@ body{
   border-radius: 999px;
   padding: 8px 14px;
   min-width: 340px;
+  position: relative;
 }
-.search-input{
+
+.search-input {
   border: none;
   outline: none;
   background: transparent;
-  font: 14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   color: var(--text);
   width: 100%;
 }
-.search-input::placeholder{ color: var(--icon); }
-.search-btn{
+
+.search-input::placeholder {
+  color: var(--icon);
+}
+
+.search-btn {
   border: none;
   background: transparent;
   cursor: pointer;
@@ -160,183 +150,243 @@ body{
   align-items: center;
   justify-content: center;
 }
-.search-btn:hover{ color: var(--icon-hover); }
 
-/* ===============================
-   FEATURE 
-   =============================== */
+.search-btn:hover {
+  color: var(--icon-hover);
+}
+
+.suggestions-list {
+  position: absolute;
+  top: calc(100% + 4px); 
+  left: 0;
+  right: 0;
+  width: 100%; 
+  max-height: 280px; 
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: none;
+  font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+.suggestions-list.show {
+  display: block;
+}
+
+.suggestions-list li {
+  list-style: none;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestions-list li::before {
+  content: "🎬";
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.suggestions-list li:hover {
+  background: var(--search-bg);
+  color: var(--accent);
+}
+
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+:root.dark .suggestions-list {
+  background: var(--card);
+  border-color: var(--border);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+
+:root.dark .suggestions-list li:hover {
+  background: var(--search-bg);
+  color: var(--icon-hover);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.suggestions-list {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
 .feature {
-    position: relative;
-    height: 60vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    padding: 0 60px;
+  position: relative;
+  height: 60vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 60px;
 }
 
 .feature-bg {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-    opacity: 0.8;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.8;
 }
 
 .feature-content {
-    max-width: 600px;
+  max-width: 600px;
 }
 
 .feature h1 {
-    font-size: 48px;
-    margin: 10px 0;
-    transition: color 0.4s ease;
+  font-size: 48px;
+  margin: 10px 0;
+  transition: color 0.4s ease;
 }
 
 .feature p {
-    font-size: 18px;
-    color: #fff;
-    transition: color 0.4s ease;
+  font-size: 18px;
+  color: #fff;
+  transition: color 0.4s ease;
 }
 
 .feature-logo {
-    width: 180px;
-    margin-bottom: 10px;
+  width: 180px;
+  margin-bottom: 10px;
 }
 
-/* ====== Nút trong feature ====== */
 .btn {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background 0.3s, color 0.3s;
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s, color 0.3s;
 }
 
 .watch {
-    background: #007BFF;
-    color: white;
+  background: #007BFF;
+  color: white;
 }
 
 .watch:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 20px rgba(0,123,255,0.8);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(0,123,255,0.8);
 }
 
 .info {
-    background: #333;
-    color: white;
-    margin-left: 10px;
+  background: #333;
+  color: white;
+  margin-left: 10px;
 }
 
 .info:hover {
-    background: #555;
-    transform: scale(1.08);
-    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+  background: #555;
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(255,255,255,0.5);
 }
 
-/* ====== Phần danh mục phim ====== */
 .movie-section {
-    margin: 40px;
+  margin: 40px;
 }
 
 .movie-section h2 {
-    margin-bottom: 20px;
-    font-size: 28px;
+  margin-bottom: 20px;
+  font-size: 28px;
 }
 
-/* Dòng chứa các phim – có thể cuộn ngang */
 .movie-row {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: #555 #111;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #111;
 }
 
 /* Thanh cuộn tùy chỉnh cho Chrome/Safari */
 .movie-row::-webkit-scrollbar {
-    height: 8px;
+  height: 8px;
 }
 
 .movie-row::-webkit-scrollbar-track {
-    background: #111;
+  background: #111;
 }
 
 .movie-row::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 10px;
+  background: #555;
+  border-radius: 10px;
 }
 
 .movie-row::-webkit-scrollbar-thumb:hover {
-    background: #888;
+  background: #888;
 }
 
 /* Card phim */
 .movie-card {
-    position: relative;
-    width: 180px;
-    height: 260px;
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    flex: 0 0 auto;
-    transition: transform 0.2s ease;
+  position: relative;
+  width: 180px;
+  height: 260px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: transform 0.2s ease;
 }
 
 .movie-card:hover {
-    transform: scale(1.08);
+  transform: scale(1.08);
 }
 
 .movie-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
-/* Nút dấu "+" */
 .movie-card .add {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.6);
-    padding: 6px 10px;
-    border-radius: 50%;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
-    transition: background 0.3s, transform 0.2s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  padding: 6px 10px;
+  border-radius: 50%;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .movie-card .add:hover {
-    background: rgba(255, 255, 255, 0.6);
-    color: black;
-    transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.6);
+  color: black;
+  transform: scale(1.1);
 }
 
-
-/* ===============================
-   RESPONSIVE
-   =============================== */
-@media (max-width: 1200px){
-  .navbar .inner{ padding: 12px 16px; }
-  .nav{ gap: 24px; }
-  .search-form{ min-width: 280px; }
+@media (max-width: 1200px) {
+  .navbar .inner { padding: 12px 16px; }
+  .nav { gap: 24px; }
+  .search-form { min-width: 280px; }
 }
-@media (max-width: 900px){
-  .feature{ padding: 0 24px; height: 50vh; }
-  .movie-section{ margin: 24px; }
-  .nav{ display: none; } /* Ẩn menu giữa trên mobile (tuỳ bạn) */
+@media (max-width: 900px) {
+  .feature { padding: 0 24px; height: 50vh; }
+  .movie-section { margin: 24px; }
+  .nav { display: none; }
 }
-@media (max-width: 480px){
-  .brand img{ height: 40px; }
-  .btn{ padding: 10px 14px; }
-  .movie-card{ width: 150px; height: 220px; }
+@media (max-width: 480px) {
+  .brand img { height: 40px; }
+  .btn { padding: 10px 14px; }
+  .movie-card { width: 150px; height: 220px; }
 }
