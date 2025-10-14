@@ -12,6 +12,8 @@ import jakarta.servlet.RequestDispatcher;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @WebServlet("/history")
@@ -26,40 +28,55 @@ public class HistoryServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     if (ds == null) {
-      throw new ServletException("DataSource jdbc/MySQLDB chưa được cấu hình hoặc sai tên JNDI.");
+      // ✅ thống nhất đúng tên JNDI
+      throw new ServletException("DataSource jdbc/loginDB chưa được cấu hình hoặc sai tên JNDI.");
     }
     historyDAO = new HistoryDAO(ds);
   }
 
-  private int getUserId(HttpServletRequest req){
-    HttpSession s = req.getSession(true);
-    Object uid = s.getAttribute("userId");
-    if (uid == null) { 
-      s.setAttribute("userId", 1); 
-      return 1; 
+  /** ✅ LẤY userId từ session như Watchlist: không tạo session mới, không gán 1, nếu chưa login thì redirect */
+  private Integer requireUserIdOrRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    HttpSession session = req.getSession(false); // ❗ không tạo mới
+    if (session == null) {
+      String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+      resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
+          URLEncoder.encode(back, StandardCharsets.UTF_8));
+      return null;
     }
-    if (uid instanceof Integer) return (Integer) uid;
-    try { 
-      return Integer.parseInt(String.valueOf(uid)); 
-    } catch (Exception e) { 
-      return 1; 
+
+    Object uid = session.getAttribute("userId");
+    Integer userId = null;
+    if (uid instanceof Integer) userId = (Integer) uid;
+    else if (uid != null) {
+      try { userId = Integer.valueOf(uid.toString()); } catch (NumberFormatException ignore) {}
     }
+
+    if (userId != null) return userId;
+
+    String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+    resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
+        URLEncoder.encode(back, StandardCharsets.UTF_8));
+    return null;
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    req.setCharacterEncoding("UTF-8");    // (tùy chọn)
-    
+    req.setCharacterEncoding("UTF-8");
+
+    // Log debug
     HttpSession session = req.getSession(false);
-	  Object uid = (session != null) ? session.getAttribute("userId") : null;
-	  System.out.println("🔍 WatchlistServlet: userId trong session = " + uid);
-	  
-	  
-    int userId = getUserId(req);
+    Object uid = (session != null) ? session.getAttribute("userId") : null;
+    System.out.println("🔍 HistoryServlet: userId trong session = " + uid);
+
+    // ✅ dùng hàm chuẩn giống Watchlist
+    Integer userId = requireUserIdOrRedirect(req, resp);
+    if (userId == null) return; // đã redirect nếu chưa đăng nhập
+
     try {
       List<HistoryItem> list = historyDAO.findByUser(userId);
-      req.setAttribute("history", list);   
+      req.setAttribute("history", list);
+      // đổi path nếu JSP của bạn nằm ở /views/history.jsp
       RequestDispatcher rd = req.getRequestDispatcher("/history.jsp");
       rd.forward(req, resp);
     } catch (SQLException e) {
@@ -71,9 +88,12 @@ public class HistoryServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
-    String action = req.getParameter("action");
-    int userId = getUserId(req);
 
+    // ✅ cũng lấy userId giống Watchlist
+    Integer userId = requireUserIdOrRedirect(req, resp);
+    if (userId == null) return;
+
+    String action = req.getParameter("action");
     if (action == null || action.isBlank()) {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing action");
       return;
@@ -82,20 +102,15 @@ public class HistoryServlet extends HttpServlet {
     try {
       switch (action) {
         case "remove": {
-          String idStr = req.getParameter("id");
-          int id = Integer.parseInt(idStr);
+          int id = Integer.parseInt(req.getParameter("id"));
           historyDAO.deleteByIdForUser(id, userId);
-          // PRG
           resp.sendRedirect(req.getContextPath() + "/history");
           break;
         }
         case "saveProgress": {
-          String vStr = req.getParameter("videoId");
-          String pStr = req.getParameter("progressSeconds");
-          int videoId = Integer.parseInt(vStr);
-          int progress = Integer.parseInt(pStr);
+          int videoId = Integer.parseInt(req.getParameter("videoId"));
+          int progress = Integer.parseInt(req.getParameter("progressSeconds"));
           historyDAO.upsertProgress(userId, videoId, progress);
-          resp.setContentType("application/json");
           resp.setStatus(HttpServletResponse.SC_NO_CONTENT); // 204
           break;
         }
