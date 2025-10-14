@@ -10,6 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Header CSS lấy từ file chung -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
     /* Chỉ style cho phần nội dung trang (không style header) */
@@ -145,7 +146,7 @@
   			<i class="fa-solid fa-bookmark"></i>
 		</a>
 
-        <a class="action-link" href="${ctx}/HomeServlet?action=GioHang" aria-label="Giỏ hàng">
+        <a class="action-link" href="${ctx}/Subscription.jsp" aria-label="Giỏ hàng">
           <i class="fa-solid fa-cart-shopping"></i>
         </a>
         <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan" aria-label="Tài khoản">

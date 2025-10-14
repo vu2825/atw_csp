@@ -21,6 +21,7 @@ public class AdminTopUpServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 		try {
 			TopUpDB topUpDB = new TopUpDB(ds);
 			String status = req.getParameter("status"); // PENDING | ACCEPT | DISCARD | null
