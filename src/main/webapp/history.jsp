@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lịch sử xem phim</title>
 
-  <!-- CSS nền dự án -->
+  <!-- CSS nền dự án (chỉnh 'styles' vs 'Styles' theo thư mục thực tế) -->
   <link rel="stylesheet" href="<c:url value='/styles/test.css'/>" />
 
   <!-- Font Awesome -->
@@ -27,7 +27,7 @@
 <body>
   <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
-  <!-- ====== NAVBAR (thay cho TOPBAR) ====== -->
+  <!-- ====== NAVBAR ====== -->
   <header class="navbar">
     <div class="inner">
       <a class="brand" href="${ctx}/">
@@ -38,9 +38,7 @@
       <nav class="nav" aria-label="Chính">
         <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
         <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
-        <a href="${ctx}/HomeServlet?action=PhimBo">Phim bộ</a>
-        <a href="${ctx}/HomeServlet?action=PhimLe">Phim lẻ</a>
-        <a href="${ctx}/HomeServlet?action=QuocGia">Quốc gia</a>
+        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
       </nav>
 
       <div class="actions" aria-label="Tác vụ">
@@ -53,6 +51,8 @@
         </form>
 
         <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
+
+        <!-- Watchlist -->
         <a class="action-link" href="${ctx}/watchlist" aria-label="Watchlist">
           <i class="fa-solid fa-bookmark"></i>
         </a>
@@ -104,30 +104,43 @@
       <section class="grid" id="historyGrid" aria-label="Danh sách phim đã xem">
         <c:forEach var="h" items="${history}">
           <article class="card">
-            <!-- ✅ dùng h.videoId thay cho h.id -->
+            <!-- Link xem lại dùng videoId -->
             <a class="poster-link" href="${ctx}/watch?id=${h.videoId}" title="Xem lại">
-              <img class="poster" src="${h.poster}" alt="${h.title}" />
+              <!-- Hướng A: tạm dùng videoUrl làm ảnh nếu có; nếu không có thì hiển thị placeholder -->
+              <c:choose>
+                <c:when test="${not empty h.videoUrl}">
+                  <img class="poster" src="${h.videoUrl}" alt="${h.title}" />
+                </c:when>
+                <c:otherwise>
+                  <div class="no-poster">Không có ảnh</div>
+                </c:otherwise>
+              </c:choose>
             </a>
+
             <div class="meta">
-              <!-- ✅ dùng h.videoId thay cho h.id -->
               <a class="poster-link" href="${ctx}/watch?id=${h.videoId}" title="Xem lại">
                 <p class="title">${h.title}</p>
               </a>
-              <div class="year">${h.year} • ${h.genre}</div>
+
+              <!-- Không có year/genre ở backend hiện tại; hiển thị duration nếu có -->
+              <c:if test="${not empty h.duration}">
+                <div class="year">${h.duration}</div>
+              </c:if>
+
               <div class="progress">Đã xem: ${h.progressSeconds} giây</div>
+
               <div class="time">
                 <i class="fa-regular fa-clock"></i>
                 <span>Lần cuối: ${h.lastWatchedAtDisplay}</span>
               </div>
 
               <div class="actions-row">
-                <!-- ✅ dùng h.videoId thay cho h.id -->
                 <a class="btn primary" href="${ctx}/watch?id=${h.videoId}">
                   <i class="fa-solid fa-play"></i> Xem lại
                 </a>
                 <form method="post" action="${ctx}/history">
                   <input type="hidden" name="action" value="remove"/>
-                  <!-- Giữ nguyên: xóa theo id bản ghi history -->
+                  <!-- Xóa theo id bản ghi history -->
                   <input type="hidden" name="id" value="${h.id}"/>
                   <button class="btn danger" type="submit">
                     <i class="fa-solid fa-trash"></i> Xóa
@@ -160,25 +173,27 @@
     })();
 
     // === Sắp xếp lịch sử ===
-    const sortSelect = document.getElementById('sortSelect');
-    const grid = document.getElementById('historyGrid');
+    (function(){
+      const sortSelect = document.getElementById('sortSelect');
+      const grid = document.getElementById('historyGrid');
+      if (!sortSelect || !grid) return;
 
-    if (sortSelect && grid) {
       sortSelect.addEventListener('change', () => {
         const cards = Array.from(grid.querySelectorAll('.card'));
         const type = sortSelect.value;
 
         if (type === 'az') {
           cards.sort((a, b) =>
-            a.querySelector('.title').textContent.localeCompare(
-              b.querySelector('.title').textContent, 'vi', { sensitivity: 'base' })
+            a.querySelector('.title').textContent
+              .localeCompare(b.querySelector('.title').textContent, 'vi', { sensitivity: 'base' })
           );
         } else if (type === 'za') {
           cards.sort((a, b) =>
-            b.querySelector('.title').textContent.localeCompare(
-              a.querySelector('.title').textContent, 'vi', { sensitivity: 'base' })
+            b.querySelector('.title').textContent
+              .localeCompare(a.querySelector('.title').textContent, 'vi', { sensitivity: 'base' })
           );
         } else {
+          // recent: reload để giữ thứ tự theo SQL (ORDER BY last_watched_at DESC)
           location.reload();
           return;
         }
@@ -186,7 +201,7 @@
         grid.innerHTML = '';
         cards.forEach(card => grid.appendChild(card));
       });
-    }
+    })();
   </script>
 </body>
 </html>

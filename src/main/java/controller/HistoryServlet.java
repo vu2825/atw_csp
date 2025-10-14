@@ -18,7 +18,7 @@ import java.util.List;
 public class HistoryServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  @Resource(name = "jdbc/loginDB")  // 🔁 Đảm bảo khớp context.xml
+  @Resource(name = "jdbc/loginDB")
   private DataSource ds;
 
   private HistoryDAO historyDAO;
@@ -53,8 +53,8 @@ public class HistoryServlet extends HttpServlet {
     int userId = getUserId(req);
     try {
       List<HistoryItem> list = historyDAO.findByUser(userId);
-      req.setAttribute("history", list);   // ✅ history.jsp sẽ dùng biến "history"
-      RequestDispatcher rd = req.getRequestDispatcher("/views/history.jsp");
+      req.setAttribute("history", list);   
+      RequestDispatcher rd = req.getRequestDispatcher("/history.jsp");
       rd.forward(req, resp);
     } catch (SQLException e) {
       throw new ServletException(e);
