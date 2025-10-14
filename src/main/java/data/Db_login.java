@@ -10,9 +10,9 @@ public class Db_login {
     private static DataSource ds;
     static {
         try {
-            ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/loginDB");
+            ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/MySQLDB");
         } catch (NamingException e) {
-            throw new RuntimeException("JNDI not found: jdbc/loginDB", e);
+            throw new RuntimeException("JNDI not found: jdbc/MySQLDB", e);
         }
     }
     public static Connection getConnection() throws SQLException {
