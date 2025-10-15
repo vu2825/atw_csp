@@ -22,17 +22,15 @@ public class HomeServlet extends HttpServlet {
 
         String url;
         switch (action) {
-            case "PhimBo":
-                url = "/PhimBo.jsp";
+            case "ListPhim":
+                url = "/movies";
                 break;
-            case "PhimLe":
-                url = "/PhimLe.jsp";
+            case "TheLoai":
+                url = "/TheLoaiServlet";
                 break;
-            case "QuocGia":
-                url = "/QuocGia.jsp";
-                break;
+                
             case "GioHang":
-                url = "/GioHang.jsp";
+                url = "/Subcription.jsp";
                 break;
             case "TaiKhoan":
                 url = "/TaiKhoan.jsp";

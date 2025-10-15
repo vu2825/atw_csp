@@ -20,8 +20,8 @@
 
       <nav class="nav" aria-label="Chính">
         <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
-        <a href="${ctx}/TheLoaiServlet">Thể loại</a>
-        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
+        <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
+        <a href="${ctx}/HomeServlet?action=ListPhim">List Phim</a>
       </nav>
 
       <div class="actions" aria-label="Tác vụ">
@@ -30,7 +30,6 @@
              <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
              <ul id="suggestions" class="suggestions-list"></ul>
         </form>
-        <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
         <a class="action-link" href="${ctx}/watchlist" aria-label="Watchlist">
   			<i class="fa-solid fa-bookmark"></i>
 		</a>
@@ -49,14 +48,14 @@
 
 <section class="feature">
     <div class="feature-content">
-        <h1>${featuredMovie.title}</h1>
-        <p>${featuredMovie.description}</p>
+        <h1>Toàn Chí Độc Giả</h1>
+        <p>Khám phá bộ phim đặc sắc "Toàn Trí Độc Giả" với chất lượng hình ảnh sắc nét và âm thanh sống động.</p>
         <div class="feature-buttons">
-            <a href="${featuredMovie.watchLink}" class="btn watch">▶ Watch Movie</a>
-            <a href="${featuredMovie.infoLink}" class="btn info">More Info →</a>
+            <a href="./watch?id=2&quality=360" class="btn watch">▶ Watch Movie</a>
+            <a href="./movie-detail?id=2" class="btn info">More Info →</a>
         </div>
     </div>
-    <img src="${featuredMovie.image}" alt="${featuredMovie.title}" class="feature-bg">
+    <img src="https://static.nutscdn.com/vimg/300-0/6550d7e93d04420e36cab7f28a0885a9.jpg" alt="${featuredMovie.title}" class="feature-bg">
 </section>
 
 <script>

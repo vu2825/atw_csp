@@ -7,23 +7,178 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gói Xem Phim - Chọn Kế Hoạch Của Bạn</title>
-<link rel="stylesheet" href="styles/style.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 /* CSS cho Navbar - Giống trang chủ, light theme mặc định */
-body {
-	font-family: Arial, sans-serif;
-	background-color: #f8f9fa; /* Nền sáng nhạt cho light theme */
-	color: #333;
-	margin: 0;
-	padding: 0; /* Không padding để navbar sát top */
+/* ===============================
+   THEME (Default = LIGHT)
+   =============================== */
+:root {
+  --bg:#f6f7fb;
+  --text:#111827;
+  --muted:#6b7280;
+
+  --card:#ffffff;
+  --border:#e5e7eb;
+
+  --accent:#2563eb;
+  --danger:#ef4444;
+
+  --icon:#c9cdd3;        /* xám nhạt cho icon */
+  --icon-hover:#2563eb;  /* màu hover */
+
+  --search-bg:#f1f2f4;   /* nền ô tìm kiếm */
+  --search-border:#eceff3;
 }
+
+:root.dark {
+  --bg:#0b0b0b;
+  --text:#e5e7eb;
+  --muted:#9aa1ad;
+
+  --card:#111827;
+  --border:#1f2937;
+
+  --accent:#2563eb;
+  --danger:#ef4444;
+
+  --icon:#a5acb8;
+  --icon-hover:#93b4ff;
+
+  --search-bg:#1f2430;
+  --search-border:#2a2f3a;
+}
+
+/* ===============================
+   BASE
+   =============================== */
+*{ box-sizing:border-box; margin:0; padding:0; }
+html, body { min-height: 100%; }
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.5 "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  transition: background .25s ease, color .25s ease;
+}
+
+/* ===============================
+   NAVBAR (TOPBAR)
+   =============================== */
+.navbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.navbar .inner{
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* logo | nav | actions */
+  align-items: center;
+  gap: 24px;
+}
+
+/* === BRAND === */
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--accent);
+}
+.brand img{
+  height: clamp(48px, 5vw, 56px);
+  width: auto;
+  display: block;
+}
+.brand span{
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: .3px;
+  color: var(--accent);
+}
+
+/* === NAV (menu giữa) === */
+.nav{
+  display: flex;
+  justify-content: center;
+  gap: 46px;
+}
+.nav a{
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  transition: color .2s ease;
+}
+.nav a:hover{ color: var(--accent); }
+.nav a.active{ color: var(--accent); }
+
+/* === ACTIONS (phần phải) === */
+.actions{
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 18px;
+}
+.actions i,
+.actions a{
+  color: var(--icon);
+  font-size: 18px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: color .15s ease, transform .15s ease;
+}
+.actions i:hover,
+.actions a:hover i{
+  color: var(--icon-hover);
+  transform: translateY(-1px);
+}
+
+/* === SEARCH FORM === */
+.search-form{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--search-bg);
+  border: 1px solid var(--search-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-width: 340px;
+}
+.search-input{
+  border: none;
+  outline: none;
+  background: transparent;
+  font: 14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color: var(--text);
+  width: 100%;
+}
+.search-input::placeholder{ color: var(--icon); }
+.search-btn{
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-btn:hover{ color: var(--icon-hover); }
 
 /* Nội dung pricing - Cách navbar */
 h1 {
 	text-align: center;
-	color: #495057;
+	color: var(--text);
 	margin: 40px 0 20px 0;
 }
 
@@ -223,43 +378,45 @@ body.light-mode .plan-card {
 </style>
 </head>
 <body>
-	<c:set var="ctx" value="${pageContext.request.contextPath}" />
-	<header class="navbar">
-		<div class="inner">
-			<a class="brand" href="${ctx}/"> <img
-				src="${ctx}/images/Logo.png" alt="Logo" class="logo-img" /> <span>HCMUTE</span>
-			</a>
+	   <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+ <header class="navbar">
+    <div class="inner">
+      <a class="brand" href="${ctx}/">
+        <img src="${ctx}/images/Logo.png" alt="Logo" class="logo-img" />
+        <span>HCMUTE</span>
+      </a>
 
-			<nav class="nav" aria-label="Chính">
-				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> 
-					<a href="${ctx}/TheLoaiServlet">Thể loại</a>
-					<a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
-			</nav>
+      <nav class="nav" aria-label="Chính">
+        <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
+        <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
+        <a href="${ctx}/HomeServlet?action=PhimChieuRap">List Phim</a>
+      </nav>
 
-			<div class="actions" aria-label="Tác vụ">
-				<form id="search-form"
-					action="${pageContext.request.contextPath}/SearchServlet"
-					method="get" class="search-form" role="search">
-					<input type="text" id="search-input" name="query"
-						class="search-input" placeholder="Tìm phim..." autocomplete="off" />
-					<button type="submit" class="search-btn">
-						<i class="fa-solid fa-magnifying-glass"></i>
-					</button>
-					<ul id="suggestions" class="suggestions-list"></ul>
-				</form>
+      <div class="actions" aria-label="Tác vụ">
+        <form action="${ctx}/HomeServlet" method="get" class="search-form" role="search" aria-label="Tìm phim">
+          <input type="hidden" name="action" value="TimKiem">
+          <input type="text" name="query" class="search-input" placeholder="Tìm phim..." />
+          <button type="submit" class="search-btn" aria-label="Tìm kiếm">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
 
-				<i class="fa-solid fa-bell" aria-label="Thông báo"></i> <a
-					class="action-link" href="${ctx}/WatchlistServlet"
-					aria-label="Watchlist"> <i class="fa-solid fa-bookmark"></i>
-				</a> <a class="action-link" href="${ctx}/Subscription.jsp"
-					aria-label="Giỏ hàng"> <i class="fa-solid fa-cart-shopping"></i>
-				</a> <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan"
-					aria-label="Tài khoản"> <i class="fa-solid fa-user"></i>
-				</a> <i id="theme-toggle" class="fa-solid fa-sun"
-					aria-label="Đổi giao diện sáng/tối"></i>
-			</div>
-		</div>
-	</header>
+
+        <a class="action-link" href="${ctx}/HomeServlet?action=watchlist" aria-label="Watchlist">
+  			<i class="fa-solid fa-bookmark"></i>
+		</a>
+
+        <a class="action-link" href="${ctx}/HomeServlet?action=GioHang" aria-label="Giỏ hàng">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </a>
+        <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan" aria-label="Tài khoản">
+          <i class="fa-solid fa-user"></i>
+        </a>
+
+        <i id="theme-toggle" class="fa-solid fa-sun" aria-label="Đổi giao diện sáng/tối"></i>
+      </div>
+    </div>
+  </header>
 
 	<main>
 		<h1>Chọn Gói Xem Phim Của Bạn</h1>
@@ -357,72 +514,31 @@ body.light-mode .plan-card {
 
 	<script>
         const toggle = document.getElementById("theme-toggle");
-        const body = document.body;
+  const root = document.documentElement; 
 
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme === "light") {
-            body.classList.add("light-mode");
-            toggle.classList.replace("fa-sun", "fa-moon");
-        }
+  // Mặc định: LIGHT (không có .dark)
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark"); 
+  }
 
-        toggle.addEventListener("click", () => {
-            body.classList.toggle("light-mode");
-            const isLight = body.classList.contains("light-mode");
-            toggle.classList.toggle("fa-sun", !isLight);
-            toggle.classList.toggle("fa-moon", isLight);
-            localStorage.setItem("theme", isLight ? "light" : "dark");
-        });
+  // Cập nhật icon
+  const updateIcon = () => {
+    const isDark = root.classList.contains("dark");
+    toggle.classList.toggle("fa-sun", !isDark); 
+    toggle.classList.toggle("fa-moon", isDark); 
+  };
+  updateIcon();
+
+  // Toggle
+  toggle.addEventListener("click", () => {
+    root.classList.toggle("dark");
+    const isDark = root.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    updateIcon();
+  });
     </script>
-
-	<script>
-        const input = document.getElementById("search-input");
-        const suggestionsList = document.getElementById("suggestions");
-
-        input.addEventListener("input", () => {
-            const query = input.value.trim();
-            suggestionsList.classList.remove("show");
-            suggestionsList.innerHTML = ""; 
-            if (query.length === 0) return;
-
-            const url = "${ctx}/SearchServlet?action=suggest&query=" + encodeURIComponent(query);
-            fetch(url)
-                .then(res => {
-                    if (!res.ok) throw new Error("Network error: " + res.status);
-                    return res.json();
-                })
-                .then(data => {
-                    console.log("Dữ liệu gợi ý:", data); 
-                    suggestionsList.innerHTML = ""; 
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(title => {
-                            const li = document.createElement("li");
-                            li.textContent = title || "Không có tiêu đề"; 
-                            suggestionsList.appendChild(li);
-                        });
-                        suggestionsList.classList.add("show");
-                    } else {
-                        const li = document.createElement("li");
-                        li.textContent = "Không có gợi ý";
-                        suggestionsList.appendChild(li);
-                        suggestionsList.classList.add("show");
-                    }
-                })
-                .catch(error => {
-                    console.error("Lỗi khi fetch gợi ý:", error);
-                    suggestionsList.innerHTML = `<li>Lỗi: ${error.message}</li>`;
-                    suggestionsList.classList.add("show");
-                });
-        });
-
-        suggestionsList.addEventListener("click", e => {
-            if (e.target.tagName === "LI") {
-                input.value = e.target.textContent;
-                suggestionsList.classList.remove("show");
-                suggestionsList.innerHTML = "";
-                document.getElementById("search-form").submit();
-            }
-        });
- </script>
-
 </body>
 </html>
