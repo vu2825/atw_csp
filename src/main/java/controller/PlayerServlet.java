@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 
 import bussines.Movie;
@@ -18,6 +17,7 @@ public class PlayerServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             resp.sendRedirect(req.getContextPath() + "/auth/login");
@@ -30,6 +30,7 @@ public class PlayerServlet extends HttpServlet {
         try {
             int videoId = Integer.parseInt(req.getParameter("id"));
             String quality = req.getParameter("quality");
+            
             
             if (quality == null || quality.isEmpty()) {
                 quality = "360";
@@ -47,12 +48,16 @@ public class PlayerServlet extends HttpServlet {
                 return; 
             }
 
+           
             try {
-                saveToWatchlist((int) user.getId(), videoId);
+                
+                saveToHistory((int) user.getId(), videoId);
             } catch (SQLException e) {
-                System.err.println("❌ Lỗi khi lưu watchlist: " + e.getMessage());
+                System.err.println("❌ Lỗi khi lưu history: " + e.getMessage());
+              
             }
 
+        
             req.setAttribute("selectedQuality", quality);
             req.setAttribute("movie", movie);
             req.setAttribute("user", user);
@@ -68,9 +73,10 @@ public class PlayerServlet extends HttpServlet {
         resp.sendError(404, "Not supported");
     }
 
-    private void saveToWatchlist(int userId, int videoId) throws SQLException {
-        String sql = "INSERT INTO thanh_toan.watchlist(user_id, video_id, added_at) VALUES(?,?,NOW()) " +
-                    "ON DUPLICATE KEY UPDATE added_at = NOW()";
+    // PHƯƠNG THỨC LƯU HISTORY
+    private void saveToHistory(int userId, int videoId) throws SQLException {
+        String sql = "INSERT INTO thanh_toan.history (user_id, video_id, last_watched_at) VALUES(?,?,NOW()) " +
+                    "ON DUPLICATE KEY UPDATE last_watched_at = NOW()";
         
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
