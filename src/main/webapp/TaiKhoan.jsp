@@ -23,19 +23,17 @@
         <h2>Quản lý tài khoản</h2>
         <ul class="menu">
             <li class="active">
-                <a href="#"></a>
+                <a href="#">
                 <i class="fa-solid fa-user"></i> Tài khoản</li>
+                </a>
             <li>
-                <a href="#"></a>
+                <a href="${ctx}/viTien.jsp">
                 <i class="fa-solid fa-plus"></i> Ví tiền</li>
+                </a>
             <li>
                 <a href="${pageContext.request.contextPath}/history">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Xem tiếp
+                    <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử xem phim
                 </a>
-            </li>
-            <li>
-                <a href="#"></a>
-                <i class="fa-solid fa-bell"></i> Thông báo
             </li>
         </ul>
     </aside>
@@ -64,7 +62,7 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-update">Cập nhật</button>
-                    <a href="index.jsp" class="btn btn-home">Trang chủ</a>
+                    <a href="${ctx}/HomeServlet" class="btn btn-home">Trang chủ</a>
                 </div>
                 
                 <p class="change-pass">

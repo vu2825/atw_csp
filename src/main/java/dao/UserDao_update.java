@@ -5,6 +5,7 @@ import bussines.User_login;
 import data.Db_login;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class UserDao_update {
         public boolean update(User_login u) throws Exception {
@@ -31,6 +32,18 @@ public class UserDao_update {
             ps.setLong(2, excludeUserId);
             return ps.executeQuery().next();
         }
-}
+    }
+        public double getWalletById(long userId) throws Exception {
+        String sql = "SELECT wallet FROM users WHERE id = ?";
+        try (Connection c = Db_login.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setLong(1, userId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getDouble("wallet");
+                }
+        }
+        return 0;
+    }
 
 }
