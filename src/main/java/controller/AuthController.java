@@ -73,11 +73,20 @@ public class AuthController extends HttpServlet {
 
                     User_login u = auth.login(loginId, password);
                     if (u != null) {
+                        // [ADDED] Chống session fixation: hủy session cũ trước khi tạo session mới
+                        HttpSession old = req.getSession(false);          // [ADDED]
+                        if (old != null) old.invalidate();                // [ADDED]
+
                         HttpSession session = req.getSession(true);
                         session.setAttribute("user", u);
                         session.setMaxInactiveInterval(30 * 60);
-                        // ✅ đi thẳng về Home, không qua login_result
-                        resp.sendRedirect(ctx + "/");
+
+                        // [ADDED] Rẽ nhánh điều hướng theo quyền isAdmin
+                        if (isAdmin(u)) {                                  // [ADDED]
+                            resp.sendRedirect(ctx + "/admin/dashboard");             // [ADDED] Admin → /admin
+                        } else {                                           // [ADDED]
+                            resp.sendRedirect(ctx + "/");                  // [ADDED] User thường → /
+                        }                                                  // [ADDED]
                     } else {
                         flashErr(req, "Sai username/email hoặc password");
                         resp.sendRedirect(ctx + "/auth/login");
@@ -137,4 +146,25 @@ public class AuthController extends HttpServlet {
             throws ServletException, IOException { req.getRequestDispatcher(view).forward(req, resp); }
     private static void flashOk(HttpServletRequest req,String msg){ req.getSession(true).setAttribute("flash_ok", msg); }
     private static void flashErr(HttpServletRequest req,String msg){ req.getSession(true).setAttribute("flash_err", msg); }
+
+    // [ADDED] Helper xác định quyền admin dựa trên kiểu dữ liệu của User_login.isAdmin
+    // Điều chỉnh cho khớp với model của bạn (boolean getIsAdmin() hoặc Integer getIsAdmin())
+    private static boolean isAdmin(User_login u) {                         // [ADDED]
+        if (u == null) return false;                                       // [ADDED]
+        try {                                                              // [ADDED]
+            // Thử các khả năng thường gặp: Boolean hoặc Integer 0/1        // [ADDED]
+            // Giả sử có getter getIsAdmin(); nếu tên khác, đổi cho đúng.   // [ADDED]
+            Object val = u.isAdmin();                                   // [ADDED]
+            if (val instanceof Boolean) return (Boolean) val;              // [ADDED]
+            if (val instanceof Integer) return ((Integer) val) == 1;       // [ADDED]
+        } catch (Throwable ignore) { /* no-op */ }                         // [ADDED]
+        // Nếu model có phương thức isAdmin() (kiểu boolean)                // [ADDED]
+        try {                                                              // [ADDED]
+            // Dùng reflection nhẹ để đỡ lệ thuộc tên field                 // [ADDED]
+            java.lang.reflect.Method m = u.getClass().getMethod("isAdmin");
+            Object r = m.invoke(u);
+            if (r instanceof Boolean) return (Boolean) r;
+        } catch (Throwable ignore) { /* no-op */ }                         // [ADDED]
+        return false;                                                      // [ADDED]
+    }                                                                      // [ADDED]
 }
