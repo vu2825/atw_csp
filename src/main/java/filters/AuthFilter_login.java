@@ -37,6 +37,20 @@ public class AuthFilter_login implements Filter {
       return;
     }
 
+    // [ADDED] Kiểm tra nếu truy cập /admin mà không phải admin → chặn
+    String adminPath = ctx + "/admin/dashboard";
+    if (uri.startsWith(adminPath)) {
+      bussines.User_login u = (bussines.User_login) req.getSession(false).getAttribute("user");
+      if (u == null || !u.isAdmin()) {
+        resp.sendRedirect(ctx + "/?err=no_permission"); // hoặc resp.setStatus(403);
+        return;
+      }
+    }
+
+    // Cho qua nếu hợp lệ
+    chain.doFilter(request, response);
+
+
     chain.doFilter(request, response);
   }
 }
