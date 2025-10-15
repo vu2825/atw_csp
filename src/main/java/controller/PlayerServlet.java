@@ -1,6 +1,5 @@
 package controller;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 
 import bussines.Movie;
@@ -18,7 +18,6 @@ public class PlayerServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Authentication check - sử dụng system của nhóm
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             resp.sendRedirect(req.getContextPath() + "/auth/login");
@@ -32,14 +31,12 @@ public class PlayerServlet extends HttpServlet {
             int videoId = Integer.parseInt(req.getParameter("id"));
             String quality = req.getParameter("quality");
             
-            // Mặc định chất lượng 360P nếu không có tham số
             if (quality == null || quality.isEmpty()) {
                 quality = "360";
             }
 
-            // SỬA LỖI Ở ĐÂY: Dùng getIsPremium() thay vì isPremium()
             if (!user.isPremium() && "480".equals(quality)) {
-                quality = "360"; // Mặc định về 360P nếu không phải premium
+                quality = "360";
                 req.setAttribute("qualityMessage", "🔒 Cần nâng cấp tài khoản Premium để xem chất lượng 480P");
             }
 
@@ -50,13 +47,17 @@ public class PlayerServlet extends HttpServlet {
                 return; 
             }
 
-            // Thêm thông tin chất lượng vào request
+            try {
+                saveToWatchlist((int) user.getId(), videoId);
+            } catch (SQLException e) {
+                System.err.println("❌ Lỗi khi lưu watchlist: " + e.getMessage());
+            }
+
             req.setAttribute("selectedQuality", quality);
             req.setAttribute("movie", movie);
             req.setAttribute("user", user);
 
-            RequestDispatcher rd = req.getRequestDispatcher("/watch.jsp");
-            rd.forward(req, resp);
+            req.getRequestDispatcher("/watch.jsp").forward(req, resp);
         } catch (NumberFormatException e) {
             resp.sendError(400, "Invalid movie ID");
         }
@@ -67,11 +68,25 @@ public class PlayerServlet extends HttpServlet {
         resp.sendError(404, "Not supported");
     }
 
+    private void saveToWatchlist(int userId, int videoId) throws SQLException {
+        String sql = "INSERT INTO thanh_toan.watchlist(user_id, video_id, added_at) VALUES(?,?,NOW()) " +
+                    "ON DUPLICATE KEY UPDATE added_at = NOW()";
+        
+        try (Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
+                "user1", "user1123@");
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            ps.setInt(2, videoId);
+            ps.executeUpdate();
+        }
+    }
+
     private Movie findMovieById(int videoId, String quality) {
         Movie movie = null;
         String sql = "";
         
-        // Chọn cột dựa trên chất lượng
         if ("480".equals(quality)) {
             sql = "SELECT id, title, url_video_480P as src FROM videos WHERE id = ?";
         } else {
@@ -90,7 +105,6 @@ public class PlayerServlet extends HttpServlet {
                     movie.setId(rs.getInt("id"));
                     movie.setTitle(rs.getString("title"));
                     
-                    // Convert Google Drive link to embed URL
                     String driveUrl = rs.getString("src");
                     String embedUrl = convertToEmbedUrl(driveUrl);
                     movie.setSrc(embedUrl);
@@ -105,10 +119,6 @@ public class PlayerServlet extends HttpServlet {
     private String convertToEmbedUrl(String driveUrl) {
         if (driveUrl == null) return null;
         
-        // Convert Google Drive share link to embed URL
-        // Example: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-        // To: https://drive.google.com/file/d/FILE_ID/preview
-        
         if (driveUrl.contains("drive.google.com")) {
             if (driveUrl.contains("/file/d/")) {
                 String fileId = extractFileId(driveUrl);
@@ -117,13 +127,11 @@ public class PlayerServlet extends HttpServlet {
                 }
             }
         }
-        return driveUrl; // Return original if can't convert
+        return driveUrl;
     }
 
     private String extractFileId(String driveUrl) {
         try {
-            // Extract file ID from Google Drive URL
-            // Pattern: /file/d/FILE_ID/view
             int start = driveUrl.indexOf("/file/d/") + 8;
             int end = driveUrl.indexOf("/", start);
             if (end == -1) {
