@@ -9,6 +9,7 @@ import java.util.Date;
 import javax.sql.DataSource;
 
 import bussines.User;
+import bussines.User_login;
 import data.UserDB;
 import data.UsersSubscriptionDB;
 import jakarta.annotation.Resource;
@@ -31,18 +32,17 @@ public class RegisterSubcription extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession session = req.getSession();
 		String plan = req.getParameter("plan");
 
-		String userIdStr = req.getParameter("userId");
-		int userId = Integer.parseInt(userIdStr != null ? userIdStr : "1");
-		HttpSession session = req.getSession();
-		System.out.println(session);
+		User_login u = (User_login) session.getAttribute("user");
+		int userId = (int) u.getId();
 		System.out.println("Plan: " + plan + ", UserId: " + userId);
 
 		try {
 			UserDB userDB = new UserDB(dataSource);
 //            User user = userDB.getUserById(userId);
-			User user = userDB.getUserById(1);
+			User user = userDB.getUserById(userId);
 
 			if (user == null) {
 				// Forward login nếu user không tồn tại
@@ -70,7 +70,7 @@ public class RegisterSubcription extends HttpServlet {
 			
 			UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
 
-			if(usersSubscriptionDB.checkSubscriptionUser(user.getId())) {
+			if(usersSubscriptionDB.checkSubscriptionUser(userId)) {
 				req.setAttribute("messageUser", "");
 				req.setAttribute("errorUser", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
@@ -87,7 +87,7 @@ public class RegisterSubcription extends HttpServlet {
 
 				us.setId(user.getId()); // didn't use but must have value
 
-				us.setUser_id(user.getId());
+				us.setUser_id(userId);
 				us.setPlan(plan);
 				us.setPrice(planCost);
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import bussines.User_login;
 import data.UserDB;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/TopUpRequest")
 public class TopUpRequest extends HttpServlet {
@@ -20,7 +22,9 @@ public class TopUpRequest extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		int userId = 3; // TODO: get from session/auth
+		HttpSession session = req.getSession();
+		User_login u = (User_login) session.getAttribute("user");
+		int userId = (int) u.getId(); // TODO: get from session/auth
 		try {
 			UserDB userDB = new UserDB(dataSource);
 			List<service.TopUpRequest> topups = userDB.findAllTopupsOfUser(userId);
@@ -52,7 +56,9 @@ public class TopUpRequest extends HttpServlet {
 					return;
 				}
 
-				int userId = 3; // TODO: from session/auth
+				HttpSession session = req.getSession();
+				User_login u = (User_login) session.getAttribute("user");
+				int userId = (int) u.getId(); // TODO: from session/auth
 				UserDB userDB = new UserDB(dataSource);
 				userDB.sendAddCredit(amount, userId);
 
