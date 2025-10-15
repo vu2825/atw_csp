@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
-@WebServlet("/WatchlistServlet")
+@WebServlet("/watchlist")
 public class WatchlistServlet extends HttpServlet {
 
   @Resource(name = "jdbc/loginDB")
