@@ -9,6 +9,7 @@ import java.util.Date;
 import javax.sql.DataSource;
 
 import bussines.User;
+import bussines.User_login;
 import data.UserDB;
 import data.UsersSubscriptionDB;
 import jakarta.annotation.Resource;
@@ -17,6 +18,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.UsersSubscription;
 import types.SubscriptionStatus;
 
@@ -30,17 +32,17 @@ public class RegisterSubcription extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession session = req.getSession();
 		String plan = req.getParameter("plan");
 
-		String userIdStr = req.getParameter("userId");
-		int userId = Integer.parseInt(userIdStr != null ? userIdStr : "1");
-		System.out.println(plan);
+		User_login u = (User_login) session.getAttribute("user");
+		int userId = (int) u.getId();
 		System.out.println("Plan: " + plan + ", UserId: " + userId);
 
 		try {
 			UserDB userDB = new UserDB(dataSource);
 //            User user = userDB.getUserById(userId);
-			User user = userDB.getUserById(1);
+			User user = userDB.getUserById(userId);
 
 			if (user == null) {
 				// Forward login nếu user không tồn tại
@@ -68,25 +70,24 @@ public class RegisterSubcription extends HttpServlet {
 			
 			UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
 
-			if(usersSubscriptionDB.checkSubscriptionUser(user.getId())) {
-				req.setAttribute("message", "");
-				req.setAttribute("error", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
+			if(usersSubscriptionDB.checkSubscriptionUser(userId)) {
+				req.setAttribute("messageUser", "");
+				req.setAttribute("errorUser", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
 			}
 			else if (walletUser >= planCost) {
 				double newWallet = walletUser - planCost;
 				userDB.updateWallet(newWallet, userId);
 				user.setWallet(newWallet);
-				req.setAttribute("message", "Subscription successful for plan: " + plan);
-				req.setAttribute("message", "Cảm ơn bạn đã mua hàng thành công");
-				req.setAttribute("error", "");
+				req.setAttribute("messageUser", "Cảm ơn bạn đã mua hàng thành công");
+				req.setAttribute("errorUser", "");
 
 				// created UserSubscription to added table user_subscription
 				UsersSubscription us = new UsersSubscription();
 
 				us.setId(user.getId()); // didn't use but must have value
 
-				us.setUser_id(user.getId());
+				us.setUser_id(userId);
 				us.setPlan(plan);
 				us.setPrice(planCost);
 
@@ -114,12 +115,12 @@ public class RegisterSubcription extends HttpServlet {
 				us.setStatus(SubscriptionStatus.fromDb("active"));
 				
 				usersSubscriptionDB.addSubscription(us);
-
+				
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res); // Forward success page
 			} 
 			else {
-				req.setAttribute("message", "");
-				req.setAttribute("error", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
+				req.setAttribute("messageUser", "");
+				req.setAttribute("errorUser", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
 			}
 		} catch (NumberFormatException e) {

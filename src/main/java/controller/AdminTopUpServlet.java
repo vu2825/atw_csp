@@ -5,6 +5,7 @@ import data.UserDB;
 import types.TopUpRequestTypes;
 import bussines.TopUp;
 import bussines.User;
+import bussines.User_login;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -21,7 +22,12 @@ public class AdminTopUpServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		HttpSession session = req.getSession(false);
+		User_login u = (User_login) session.getAttribute("user");
+		if(!u.isAdmin()) {
+			getServletContext().getRequestDispatcher("/").forward(req, resp);
+		};
+		
 		try {
 			TopUpDB topUpDB = new TopUpDB(ds);
 			String status = req.getParameter("status"); // PENDING | ACCEPT | DISCARD | null
@@ -39,8 +45,13 @@ public class AdminTopUpServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
+		HttpSession session = request.getSession(false);
+		User_login u = (User_login) session.getAttribute("user");
+		if(!u.isAdmin()) {
+			System.out.print(u.isAdmin());
+			getServletContext().getRequestDispatcher("/").forward(request, response);
+		};
 		try {
-			TopUpDB topUpDB = new TopUpDB(ds);
 			switch (action) {
 			case "ACCEPT":
 			case "DISCARD": {
