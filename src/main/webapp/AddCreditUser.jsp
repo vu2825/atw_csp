@@ -12,46 +12,13 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- Styles nội bộ ứng dụng -->
-<link rel="stylesheet" href="/styles/style.css'/>">
+<link rel="stylesheet" href="styles/style.css">
 <style>
 body {
 	font-family: Arial, sans-serif;
 	background: #f8f9fa;
 	color: #333;
 	margin: 0;
-}
-
-.navbar {
-	background: #f8f9fa;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 20px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
-}
-
-nav {
-	display: flex;
-	gap: 20px;
-}
-
-nav a {
-	text-decoration: none;
-	color: #333;
-	font-weight: 500;
-	padding: 8px 12px;
-	border-radius: 4px;
-}
-
-nav a:hover {
-	background: #e9ecef;
-	color: #007bff;
-}
-
-.nav-icons {
-	display: flex;
-	gap: 15px;
-	align-items: center;
 }
 
 .container {
@@ -228,7 +195,8 @@ body:not(.light-mode) .amount-input:focus {
 	border-color: #60a5fa;
 	box-shadow: 0 0 0 3px rgba(37, 99, 235, .35);
 }
-.logo-img{
+
+.logo-img {
 	width: 40px;
 }
 
@@ -249,27 +217,41 @@ body:not(.light-mode) .amount-input:focus {
 </style>
 </head>
 <body>
-
+	<c:set var="ctx" value="${pageContext.request.contextPath}" />
 	<!-- Header inline, không include -->
 	<header class="navbar">
-		<div class="logo">
-			<img src="images/Logo.png" alt="Logo" class="logo-img">
-		</div>
+		<div class="inner">
+			<a class="brand" href="${ctx}/"> <img
+				src="${ctx}/images/Logo.png" alt="Logo" class="logo-img" /> <span>HCMUTE</span>
+			</a>
 
-		<nav>
-			<a href="HomeServlet?action=TrangChu">Trang chủ</a>
-		        <a href="${ctx}/TheLoaiServlet">Thể loại</a>
-                        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
-		</nav>
+			<nav class="nav" aria-label="Chính">
+				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> <a
+					href="${ctx}/TheLoaiServlet">Thể loại</a> <a
+					href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
+			</nav>
 
-		<div class="nav-icons">
-			<i id="search-icon" class="fa-solid fa-magnifying-glass"></i> <i
-				class="fa-solid fa-bell"></i> <i class="fa-solid fa-bookmark"></i> <a
-				href="HomeServlet?action=GioHang"> <i
-				class="fa-solid fa-cart-shopping"></i>
-			</a> <a href="HomeServlet?action=TaiKhoan"> <i
-				class="fa-solid fa-user"></i>
-			</a> <i id="theme-toggle" class="fa-solid fa-sun"></i>
+			<div class="actions" aria-label="Tác vụ">
+				<form id="search-form"
+					action="${pageContext.request.contextPath}/SearchServlet"
+					method="get" class="search-form" role="search">
+					<input type="text" id="search-input" name="query"
+						class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+					<button type="submit" class="search-btn">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+					<ul id="suggestions" class="suggestions-list"></ul>
+				</form>
+				<i class="fa-solid fa-bell" aria-label="Thông báo"></i> <a
+					class="action-link" href="${ctx}/WatchlistServlet"
+					aria-label="Watchlist"> <i class="fa-solid fa-bookmark"></i>
+				</a> <a class="action-link" href="${ctx}/Subscription.jsp"
+					aria-label="Giỏ hàng"> <i class="fa-solid fa-cart-shopping"></i>
+				</a> <a class="action-link" href="${ctx}/HomeServlet?action=TaiKhoan"
+					aria-label="Tài khoản"> <i class="fa-solid fa-user"></i>
+				</a> <i id="theme-toggle" class="fa-solid fa-sun"
+					aria-label="Đổi giao diện sáng/tối"></i>
+			</div>
 		</div>
 	</header>
 
