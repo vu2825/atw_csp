@@ -291,14 +291,13 @@
             </nav>
 
             <div class="actions" aria-label="Tác vụ">
-             <form id="search-form" action="${pageContext.request.contextPath}/SearchServlet" method="get" class="search-form" role="search">
-             <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
-             <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-             <ul id="suggestions" class="suggestions-list"></ul>
-             </form>
+            <form id="search-form" action="${ctx}/SearchServlet" method="get" class="search-form" role="search">
+            <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+            <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <ul id="suggestions" class="suggestions-list"></ul>
+            </form> 
 
-                <i class="fa-solid fa-bell" aria-label="Thông báo"></i>
-                <a class="action-link" href="<%= ctx %>/WatchlistServlet" aria-label="Watchlist">
+                <a class="action-link" href="<%= ctx %>/watchlist" aria-label="Watchlist">
                     <i class="fa-solid fa-bookmark"></i>
                 </a>
 
@@ -444,9 +443,7 @@
             });
         });
     </script>
-    
-    
-    <script>
+   <script>
         const input = document.getElementById("search-input");
         const suggestionsList = document.getElementById("suggestions");
 
@@ -494,7 +491,6 @@
                 document.getElementById("search-form").submit();
             }
         });
- </script>
-    
+    </script>
 </body>
 </html>

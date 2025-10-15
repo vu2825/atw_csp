@@ -33,7 +33,11 @@ public class ProfileServlet extends HttpServlet {
             changePassword(req, resp);
             return;
         }
-
+        if ("logout".equals(action)) {
+            logout(req, resp);
+        return;
+        }
+        
         try {
             long id = Long.parseLong(req.getParameter("id"));
             String fullname = req.getParameter("fullname");
@@ -130,5 +134,15 @@ public class ProfileServlet extends HttpServlet {
             req.setAttribute("error", "️ Lỗi khi đổi mật khẩu: " + e.getMessage());
             req.getRequestDispatcher("/TaiKhoan.jsp").forward(req, resp);
         }
+    }
+    
+    private void logout(HttpServletRequest req, HttpServletResponse resp)
+        throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate(); // 🔹 Xóa toàn bộ session
+        }
+        resp.sendRedirect(req.getContextPath() + "/auth/login"); // 🔹 Chuyển hướng đến trang login
+        return;
     }
 }

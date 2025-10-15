@@ -127,7 +127,7 @@
       <nav class="nav" aria-label="Chính">
         <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
         <a href="${ctx}/TheLoaiServlet">Thể loại</a>
-        <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
+        <a href="${ctx}/movies">List Phim</a>
       </nav>
 
       <div class="actions" aria-label="Tác vụ">

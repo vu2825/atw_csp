@@ -94,14 +94,13 @@ public class AdminTopUpServlet extends HttpServlet {
 			}
 
 			default:
-response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Update failed");
 		}
 	}
-
 	private static String enc(String s) {
 		return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
 	}

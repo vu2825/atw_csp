@@ -30,7 +30,7 @@ public class HomeServlet extends HttpServlet {
                 break;
                 
             case "GioHang":
-                url = "/Subcription.jsp";
+                url = "/Subscription.jsp";
                 break;
             case "TaiKhoan":
                 url = "/TaiKhoan.jsp";
