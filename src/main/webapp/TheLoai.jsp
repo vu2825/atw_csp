@@ -23,8 +23,8 @@
 
         <nav class="nav">
             <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
-            <a href="${ctx}/TheLoaiServlet">Thể loại</a>
-            <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
+            <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
+            <a href="${ctx}/HomeServlet?action=ListPhim">List Phim</a>
         </nav>
 
         <div class="actions" aria-label="Tác vụ">
@@ -77,7 +77,7 @@
                 <div class="movie-card-content">
                     <h3>${v.title}</h3>
                     <p>${v.genre}</p>
-                    <a href="${v.urlVideo480p}" target="_blank" class="btn">Xem ngay</a>
+                    <a href="${ctx}/movie-detail?id=${v.id}" class="btn">Xem ngay</a>
                 </div>
             </div>
         </c:forEach>
