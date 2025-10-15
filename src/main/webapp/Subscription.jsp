@@ -231,17 +231,22 @@ body.light-mode .plan-card {
 			</a>
 
 			<nav class="nav" aria-label="Chính">
-				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> <a
-				<a href="${ctx}/TheLoaiServlet">Thể loại</a>
-                                <a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
+				<a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a> 
+					<a href="${ctx}/TheLoaiServlet">Thể loại</a>
+					<a href="${ctx}/HomeServlet?action=PhimBo">List Phim</a>
 			</nav>
 
 			<div class="actions" aria-label="Tác vụ">
-		        <form id="search-form" action="${pageContext.request.contextPath}/SearchServlet" method="get" class="search-form" role="search">
-                        <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
-                        <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-                        <ul id="suggestions" class="suggestions-list"></ul>
-                        </form>
+				<form id="search-form"
+					action="${pageContext.request.contextPath}/SearchServlet"
+					method="get" class="search-form" role="search">
+					<input type="text" id="search-input" name="query"
+						class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+					<button type="submit" class="search-btn">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+					<ul id="suggestions" class="suggestions-list"></ul>
+				</form>
 
 				<i class="fa-solid fa-bell" aria-label="Thông báo"></i> <a
 					class="action-link" href="${ctx}/WatchlistServlet"
@@ -263,18 +268,18 @@ body.light-mode .plan-card {
 			mãi đặc biệt - Tiết kiệm ngay hôm nay với giá giảm!</p>
 
 		<%-- Hiển thị thông báo thành công NẾU có --%>
-		<c:if test="${not empty message}">
+		<c:if test="${not empty messageUser}">
 			<div class="alert alert-success">
 				<i class="fa-solid fa-circle-check"></i>
-				<c:out value="${message}" />
+				<c:out value="${messageUser}" />
 			</div>
 		</c:if>
 
 		<%-- Hiển thị thông báo lỗi NẾU có --%>
-		<c:if test="${not empty error}">
+		<c:if test="${not empty errorUser}">
 			<div class="alert alert-error">
 				<i class="fa-solid fa-triangle-exclamation"></i>
-				<c:out value="${error}" />
+				<c:out value="${errorUser}" />
 			</div>
 		</c:if>
 
@@ -368,8 +373,8 @@ body.light-mode .plan-card {
             localStorage.setItem("theme", isLight ? "light" : "dark");
         });
     </script>
-    
-    <script>
+
+	<script>
         const input = document.getElementById("search-input");
         const suggestionsList = document.getElementById("suggestions");
 
@@ -418,6 +423,6 @@ body.light-mode .plan-card {
             }
         });
  </script>
-    
+
 </body>
 </html>

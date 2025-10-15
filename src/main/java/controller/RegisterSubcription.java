@@ -17,6 +17,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.UsersSubscription;
 import types.SubscriptionStatus;
 
@@ -34,7 +35,8 @@ public class RegisterSubcription extends HttpServlet {
 
 		String userIdStr = req.getParameter("userId");
 		int userId = Integer.parseInt(userIdStr != null ? userIdStr : "1");
-		System.out.println(plan);
+		HttpSession session = req.getSession();
+		System.out.println(session);
 		System.out.println("Plan: " + plan + ", UserId: " + userId);
 
 		try {
@@ -69,17 +71,16 @@ public class RegisterSubcription extends HttpServlet {
 			UsersSubscriptionDB usersSubscriptionDB = new UsersSubscriptionDB(dataSource);
 
 			if(usersSubscriptionDB.checkSubscriptionUser(user.getId())) {
-				req.setAttribute("message", "");
-				req.setAttribute("error", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
+				req.setAttribute("messageUser", "");
+				req.setAttribute("errorUser", "Bạn Đã Đăng Ký Trước Đó, Vui Lòng Đợi Đăng Ký Hết HIệu Lực");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
 			}
 			else if (walletUser >= planCost) {
 				double newWallet = walletUser - planCost;
 				userDB.updateWallet(newWallet, userId);
 				user.setWallet(newWallet);
-				req.setAttribute("message", "Subscription successful for plan: " + plan);
-				req.setAttribute("message", "Cảm ơn bạn đã mua hàng thành công");
-				req.setAttribute("error", "");
+				req.setAttribute("messageUser", "Cảm ơn bạn đã mua hàng thành công");
+				req.setAttribute("errorUser", "");
 
 				// created UserSubscription to added table user_subscription
 				UsersSubscription us = new UsersSubscription();
@@ -114,12 +115,12 @@ public class RegisterSubcription extends HttpServlet {
 				us.setStatus(SubscriptionStatus.fromDb("active"));
 				
 				usersSubscriptionDB.addSubscription(us);
-
+				
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res); // Forward success page
 			} 
 			else {
-				req.setAttribute("message", "");
-				req.setAttribute("error", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
+				req.setAttribute("messageUser", "");
+				req.setAttribute("errorUser", "Ban Không Đủ Số Dư Để Thanh Toán, Vui Lòng Nạp Thêm");
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
 			}
 		} catch (NumberFormatException e) {
