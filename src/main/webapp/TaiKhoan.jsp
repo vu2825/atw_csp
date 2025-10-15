@@ -63,10 +63,7 @@
                 <div class="form-actions">
                     <button type="submit" class="btn btn-update">Cập nhật</button>
                     <a href="${ctx}/HomeServlet" class="btn btn-home">Trang chủ</a>
-                    <form action="${ctx}/ProfileServlet" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="logout">
-                        <button type="submit" class="btn btn-home">Đăng xuất</button>
-                    </form>
+                    <a href="${ctx}/logout" class="btn btn-home">Đăng xuất</a>
                 </div>
                 
                 <p class="change-pass">

@@ -70,15 +70,19 @@ public class ProfileServlet extends HttpServlet {
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = new File(filePart.getSubmittedFileName()).getName();
 
+                // 🔹 Đường dẫn thư mục lưu ảnh trong webapp (VD: target/.../profile_images)
                 String uploadPath = getServletContext().getRealPath("/profile_images");
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) uploadDir.mkdirs();
 
+                // Ghi file vào thư mục
                 filePart.write(uploadPath + File.separator + fileName);
             }
-
+            
             User_login user = (User_login) req.getSession().getAttribute("user");
-            if (fileName == null) fileName = user.getAvatar();
+             if (fileName == null || fileName.isEmpty()) {
+                fileName = user.getAvatar();
+            }
 
             user.setFullname(fullname);
             user.setUsername(username);

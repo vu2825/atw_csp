@@ -88,12 +88,6 @@ body {
 }
 
 /* 🔹 FORM chính */
-.profile-form {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 50px;
-}
 
 /* --- Cột trái --- */
 .form-left {
@@ -182,45 +176,15 @@ body {
   text-decoration: underline;
 }
 
-/* --- Cột phải (avatar) --- */
-.form-right {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-}
 
 .avatar-wrapper {
   cursor: pointer;
 }
 
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #3b82f6;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  margin-bottom: 8px;
-}
 
 .avatar:hover {
   transform: scale(1.05);
   filter: brightness(1.15);
-}
-
-.avatar-note {
-  color: #cbd5e1;
-  font-size: 14px;
-}
-
-.avatar-note .clickable-text {
-  color: #facc15;
-  cursor: pointer;
-  text-decoration: underline;
-}
-.avatar-note .clickable-text:hover {
-  color: #fde047;
 }
 
 /* --- Popup Overlay --- */
@@ -308,4 +272,54 @@ body {
 }
 .popup-actions .btn-cancel:hover {
     background-color: #475569;
+}
+
+.profile-form {
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  gap: 50px;
+}
+
+
+/* Form bên trái */
+.form-left {
+  flex: 1;
+  max-width: 550px;
+}
+
+/* Avatar bên phải */
+.form-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: -150px;  /* 🔹 tăng giá trị này để hạ avatar xuống */
+}
+
+/* Avatar */
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  margin-bottom: 10px;
+  margin-right: 200px;
+}
+
+.avatar-note {
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.avatar-note .clickable-text {
+  color: #facc15;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-right: 200px;
+  margin-top: -70px;
+}
+
+.avatar-note .clickable-text:hover {
+  color: #fde047;
 }
