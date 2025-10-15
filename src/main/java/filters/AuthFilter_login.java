@@ -50,7 +50,5 @@ public class AuthFilter_login implements Filter {
     // Cho qua nếu hợp lệ
     chain.doFilter(request, response);
 
-
-    chain.doFilter(request, response);
   }
 }

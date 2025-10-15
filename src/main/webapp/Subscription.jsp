@@ -389,7 +389,7 @@ body.light-mode .plan-card {
       <nav class="nav" aria-label="Chính">
         <a href="${ctx}/HomeServlet?action=TrangChu">Trang chủ</a>
         <a href="${ctx}/HomeServlet?action=TheLoai">Thể loại</a>
-        <a href="${ctx}/HomeServlet?action=PhimChieuRap">List Phim</a>
+        <a href="${ctx}/HomeServlet?action=ListPhim">List Phim</a>
       </nav>
 
       <div class="actions" aria-label="Tác vụ">
