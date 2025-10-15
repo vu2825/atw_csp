@@ -11,9 +11,31 @@ import java.sql.*;
 
 import bussines.Movie;
 import bussines.User_login;
+import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 @WebServlet("/watch")
 public class PlayerServlet extends HttpServlet {
+    
+    private static final long serialVersionUID = 1L;
+    private DataSource dataSource;
+
+    @Override
+    public void init() throws ServletException {
+        try {
+            InitialContext ic = new InitialContext();
+            dataSource = (DataSource) ic.lookup("java:/comp/env/jdbc/loginDB");
+            System.out.println("✅ DataSource initialized successfully");
+        } catch (NamingException e) {
+            System.err.println("❌ Không tìm thấy DataSource jdbc/loginDB: " + e.getMessage());
+            throw new ServletException("Không tìm thấy DataSource jdbc/loginDB. Kiểm tra context.xml", e);
+        }
+    }
+
+    private Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,12 +47,10 @@ public class PlayerServlet extends HttpServlet {
         }
         
         User_login user = (User_login) session.getAttribute("user");
-        System.out.println("✓ User watching movie: " + user.getUsername());
 
         try {
             int videoId = Integer.parseInt(req.getParameter("id"));
             String quality = req.getParameter("quality");
-            
             
             if (quality == null || quality.isEmpty()) {
                 quality = "360";
@@ -48,16 +68,12 @@ public class PlayerServlet extends HttpServlet {
                 return; 
             }
 
-           
             try {
-                
                 saveToHistory((int) user.getId(), videoId);
             } catch (SQLException e) {
-                System.err.println("❌ Lỗi khi lưu history: " + e.getMessage());
-              
+                System.err.println("Lỗi khi lưu history: " + e.getMessage());
             }
 
-        
             req.setAttribute("selectedQuality", quality);
             req.setAttribute("movie", movie);
             req.setAttribute("user", user);
@@ -73,14 +89,12 @@ public class PlayerServlet extends HttpServlet {
         resp.sendError(404, "Not supported");
     }
 
-    // PHƯƠNG THỨC LƯU HISTORY
+    // PHƯƠNG THỨC LƯU HISTORY SỬ DỤNG DATASOURCE
     private void saveToHistory(int userId, int videoId) throws SQLException {
         String sql = "INSERT INTO thanh_toan.history (user_id, video_id, last_watched_at) VALUES(?,?,NOW()) " +
                     "ON DUPLICATE KEY UPDATE last_watched_at = NOW()";
         
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
-                "user1", "user1123@");
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setInt(1, userId);
@@ -99,9 +113,7 @@ public class PlayerServlet extends HttpServlet {
             sql = "SELECT id, title, url_video_360P as src FROM videos WHERE id = ?";
         }
         
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
-                "user1", "user1123@");
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setInt(1, videoId);
