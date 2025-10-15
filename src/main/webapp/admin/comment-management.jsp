@@ -41,7 +41,7 @@
             width: 100%;
             border-collapse: collapse;
             background-color: #111;
-            table-layout: fixed; /* cho phép set width linh hoạt */
+            table-layout: fixed;
         }
 
         thead th {
@@ -86,6 +86,22 @@
         }
         .delete-btn:hover { background: #ff1a23; transform: translateY(-1px); }
 
+        /* Nút xem */
+        .view-btn {
+            background: #1e90ff;
+            color: #fff;
+            padding: 6px 10px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        .view-btn:hover {
+            background: #3aa0ff;
+            transform: translateY(-1px);
+        }
+
         /* Sao */
         .star { color: #555; }
         .star.active { color: #f39c12; }
@@ -113,9 +129,9 @@
         /* Set kích thước cột + canh lề chuẩn trong bảng */
         th.col-id,    td.col-id    { width: 60px;  text-align: center; }
         th.col-user,  td.col-user  { width: 140px; text-align: left;   }
-        th.col-video, td.col-video { width: 120px; text-align: left;   }
+        th.col-video, td.col-video { width: 120px; text-align: center; }
         th.col-rating,td.col-rating{ width: 120px; text-align: center; }
-        th.col-comment,td.col-comment { width: auto;  text-align: left; } /* chiếm phần còn lại */
+        th.col-comment,td.col-comment { width: auto; text-align: left; }
         th.col-date,  td.col-date  { width: 160px; text-align: center; white-space: nowrap; }
         th.col-actions,td.col-actions{ width: 100px; text-align: center; }
     </style>
@@ -128,7 +144,7 @@
 <div class="content-wrap">
     <h2>Quản lý bình luận & đánh giá</h2>
 
-    <!-- SORT đơn giản: giữ format, không thêm CSS mới -->
+    <!-- SORT đơn giản -->
     <form method="get" action="${pageContext.request.contextPath}/admin/comment-controller" style="margin:0 0 12px 0;">
         <label style="font-size:13px;color:#ccc;margin-right:6px;">Sắp xếp:</label>
         <select name="sort" onchange="this.form.submit()" style="background:#141414;color:#e6e6e6;border:1px solid #222;padding:6px 8px;border-radius:6px;">
@@ -147,7 +163,7 @@
             <tr>
                 <th class="col-id">ID</th>
                 <th class="col-user">User ID</th>
-                <th class="col-video">Video ID</th>
+                <th class="col-video">Video</th>
                 <th class="col-rating">Rating</th>
                 <th class="col-comment">Comment</th>
                 <th class="col-date">Created At</th>
@@ -159,7 +175,11 @@
                 <tr>
                     <td class="col-id">${comment.id}</td>
                     <td class="col-user">${comment.userId}</td>
-                    <td class="col-video">${comment.videoId}</td>
+                    <td class="col-video">
+                        <a href="${pageContext.request.contextPath}/movie-detail?id=${comment.videoId}" class="view-btn">
+                            Xem
+                        </a>
+                    </td>
                     <td class="col-rating">
                         <c:forEach begin="1" end="5" var="i">
                             <span class="star ${i <= comment.rating ? 'active' : ''}">★</span>

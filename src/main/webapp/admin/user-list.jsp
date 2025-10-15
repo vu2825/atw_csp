@@ -183,7 +183,6 @@
                 <select name="role">
                     <option value="" ${empty role ? 'selected' : ''}>All</option>
                     <option value="premium" ${role == 'premium' ? 'selected' : ''}>Premium</option>
-                    <option value="admin" ${role == 'admin' ? 'selected' : ''}>Admin</option>
                 </select>
             </div>
 
@@ -220,7 +219,6 @@
                 <th class="col-user">Username</th>
                 <th class="col-email">Email</th>
                 <th class="col-wallet">Wallet</th>
-                <th class="col-flag">Admin</th>
                 <th class="col-flag">Premium</th>
                 <th class="col-action">Action</th>
             </tr>
@@ -229,7 +227,7 @@
             <c:choose>
                 <c:when test="${empty userList}">
                     <tr>
-                        <td colspan="7" style="text-align:center;color:#aaa;padding:18px;">
+                        <td colspan="6" style="text-align:center;color:#aaa;padding:18px;">
                             Không có dữ liệu phù hợp.
                         </td>
                     </tr>
@@ -246,11 +244,6 @@
                             </td>
                             <td class="col-wallet">
                                 <fmt:formatNumber value="${user.wallet}" type="number" groupingUsed="true" minFractionDigits="0" maxFractionDigits="2"/>
-                            </td>
-                            <td class="col-flag">
-                                <span class="tag ${user.isAdmin ? 'tag-yes' : 'tag-no'}">
-                                    ${user.isAdmin ? 'YES' : 'NO'}
-                                </span>
                             </td>
                             <td class="col-flag">
                                 <span class="tag ${user.isPremium ? 'tag-yes' : 'tag-no'}">

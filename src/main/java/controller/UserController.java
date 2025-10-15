@@ -5,101 +5,135 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import bussines.User;
-import jakarta.servlet.*;
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/admin/user-controller")
 public class UserController extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-    // ---- Kết nối DB ----
-    private Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?sslMode=REQUIRED&useUnicode=true&characterEncoding=UTF-8",
-                "user1",
-                "user1123@"
-        );
+    @Resource(name = "jdbc/loginDB")
+    private DataSource dataSource;
+
+    @Override
+    public void init() {
+        if (dataSource == null) {
+            try {
+                InitialContext ic = new InitialContext();
+                dataSource = (DataSource) ic.lookup("java:/comp/env/jdbc/loginDB");
+            } catch (NamingException e) {
+                throw new RuntimeException("Không tìm thấy DataSource jdbc/loginDB", e);
+            }
+        }
     }
 
-    // ---- GET: list / delete + filter/sort/search ----
+    private Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // action=delete?id=...
+        request.setCharacterEncoding("UTF-8");
+
         String action = request.getParameter("action");
         if ("delete".equalsIgnoreCase(action)) {
-            deleteUser(request, response);
+            boolean ok = deleteUser(request);
+            if (!response.isCommitted()) {
+                response.sendRedirect(request.getContextPath() + "/admin/user-controller");
+            }
             return;
         }
 
-        // Filter / Sort / Search
-        String role = request.getParameter("role");   // "", "premium", "admin"
-        String sort = request.getParameter("sort");   // "", "wallet_asc", "wallet_desc"
-        String q    = request.getParameter("q");      // keyword username/email
+        // Filter / Sort / Search + Pagination
+        String role = nz(request.getParameter("role"));
+        String sort = nz(request.getParameter("sort"));
+        String q    = nz(request.getParameter("q"));
 
-        // Giữ lại để render lại form
+        int page = parsePositiveInt(request.getParameter("page"), 1);
+        int pageSize = 10; // cố định đơn giản
+
         request.setAttribute("role", role);
         request.setAttribute("sort", sort);
         request.setAttribute("q", q);
+        request.setAttribute("page", page);
+        request.setAttribute("pageSize", pageSize);
 
-        listUsers(request, response, role, sort, q);
+        listUsers(request, response, role, sort, q, page, pageSize);
     }
 
-    // ---- Liệt kê người dùng (có filter/sort/search) ----
     private void listUsers(HttpServletRequest request, HttpServletResponse response,
-                           String role, String sort, String q)
+                           String role, String sort, String q, int page, int pageSize)
             throws ServletException, IOException {
 
         List<User> users = new ArrayList<>();
-
-        StringBuilder sql = new StringBuilder(
-                "SELECT id, username, email, wallet, isAdmin, isPremium FROM users WHERE 1=1"
-        );
         List<Object> params = new ArrayList<>();
 
-        // Filter theo role
-        if (role != null) {
-            if ("premium".equalsIgnoreCase(role)) {
-                sql.append(" AND isPremium = ?");
-                params.add(true);
-            } else if ("admin".equalsIgnoreCase(role)) {
-                sql.append(" AND isAdmin = ?");
-                params.add(true);
-            }
+        StringBuilder base = new StringBuilder(
+            " FROM users WHERE 1=1"
+        );
+        base.append(" AND isAdmin = 0");
+
+        // Filter role
+        if ("premium".equalsIgnoreCase(role)) {
+            base.append(" AND isPremium = ?");
+            params.add(true);
         }
 
-        // Search theo username/email (không phân biệt hoa thường)
-        if (q != null && !q.trim().isEmpty()) {
+        // Search
+        if (!q.isBlank()) {
             String like = "%" + q.trim().toLowerCase() + "%";
-            sql.append(" AND (LOWER(username) LIKE ? OR LOWER(email) LIKE ?)");
+            base.append(" AND (LOWER(username) LIKE ? OR LOWER(email) LIKE ?)");
             params.add(like);
             params.add(like);
         }
 
-        // Sort
+        // Sort whitelist
+        String orderBy = " ORDER BY id DESC";
         if ("wallet_asc".equalsIgnoreCase(sort)) {
-            sql.append(" ORDER BY wallet ASC, id DESC");
+            orderBy = " ORDER BY wallet ASC, id DESC";
         } else if ("wallet_desc".equalsIgnoreCase(sort)) {
-            sql.append(" ORDER BY wallet DESC, id DESC");
-        } else {
-            sql.append(" ORDER BY id DESC");
+            orderBy = " ORDER BY wallet DESC, id DESC";
         }
+
+        // Đếm tổng để phân trang
+        String countSql = "SELECT COUNT(*)" + base;
+        long total = 0;
+        try (Connection conn = getConnection();
+             PreparedStatement cps = conn.prepareStatement(countSql)) {
+
+            bindParams(cps, params);
+            try (ResultSet crs = cps.executeQuery()) {
+                if (crs.next()) total = crs.getLong(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Không thể đếm người dùng: " + e.getMessage());
+        }
+
+        int offset = Math.max(0, (page - 1) * pageSize);
+
+        String dataSql = "SELECT id, username, email, wallet, isAdmin, isPremium"
+                       + base.toString()
+                       + orderBy
+                       + " LIMIT ? OFFSET ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+             PreparedStatement ps = conn.prepareStatement(dataSql)) {
 
-            // Bind params an toàn
-            for (int i = 0; i < params.size(); i++) {
-                Object v = params.get(i);
-                if (v instanceof String) ps.setString(i + 1, (String) v);
-                else if (v instanceof Boolean) ps.setBoolean(i + 1, (Boolean) v);
-                else if (v instanceof Integer) ps.setInt(i + 1, (Integer) v);
-                else if (v instanceof Double) ps.setDouble(i + 1, (Double) v);
-                else ps.setObject(i + 1, v);
-            }
+            int idx = bindParams(ps, params);
+            ps.setInt(idx++, pageSize);
+            ps.setInt(idx, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -107,7 +141,7 @@ public class UserController extends HttpServlet {
                     u.setId(rs.getInt("id"));
                     u.setUsername(rs.getString("username"));
                     u.setEmail(rs.getString("email"));
-                    u.setWallet(rs.getDouble("wallet"));
+                    u.setWallet(rs.getDouble("wallet")); // giữ double ✅
                     u.setIsAdmin(rs.getBoolean("isAdmin"));
                     u.setIsPremium(rs.getBoolean("isPremium"));
                     users.add(u);
@@ -115,37 +149,87 @@ public class UserController extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("error", "Không thể tải danh sách người dùng: " + e.getMessage());
         }
 
+        long totalPages = (long) Math.ceil(total / (double) pageSize);
         request.setAttribute("userList", users);
+        request.setAttribute("total", total);
+        request.setAttribute("totalPages", totalPages);
+
         request.getRequestDispatcher("/admin/user-list.jsp").forward(request, response);
     }
 
-    // ---- Xoá người dùng ----
-    private void deleteUser(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    private boolean deleteUser(HttpServletRequest request) {
         String idStr = request.getParameter("id");
-        if (idStr == null || idStr.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/admin/user-controller");
-            return;
+        if (idStr == null || idStr.isBlank()) return false;
+
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            return false;
         }
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE id = ?")) {
-            ps.setInt(1, Integer.parseInt(idStr));
-            ps.executeUpdate();
+        final String checkAdminSql = "SELECT isAdmin FROM users WHERE id = ?";
+        final String hardDeleteSql = "DELETE FROM users WHERE id = ?";
+
+        try (Connection conn = getConnection()) {
+            // check admin
+            try (PreparedStatement ps = conn.prepareStatement(checkAdminSql)) {
+                ps.setInt(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next() && rs.getBoolean(1)) {
+                        return false;
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(hardDeleteSql)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            return true;
+        } catch (SQLIntegrityConstraintViolationException fk) {
+            fk.printStackTrace();
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-
-        response.sendRedirect(request.getContextPath() + "/admin/user-controller");
     }
 
-    // ---- POST: không dùng để thêm/sửa ở phiên bản này ----
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Chỉ redirect về list
-        response.sendRedirect(request.getContextPath() + "/admin/user-controller");
+        request.setCharacterEncoding("UTF-8");
+        if (!response.isCommitted()) {
+            response.sendRedirect(request.getContextPath() + "/admin/user-controller");
+        }
+    }
+
+    // Helpers
+    private static String nz(String s) { return s == null ? "" : s; }
+
+    private static int parsePositiveInt(String raw, int defVal) {
+        try {
+            int v = Integer.parseInt(raw);
+            return v > 0 ? v : defVal;
+        } catch (Exception e) {
+            return defVal;
+        }
+    }
+
+    private static int bindParams(PreparedStatement ps, List<Object> params) throws SQLException {
+        int idx = 1;
+        for (Object v : params) {
+            if (v instanceof String)       ps.setString(idx++, (String) v);
+            else if (v instanceof Boolean) ps.setBoolean(idx++, (Boolean) v);
+            else if (v instanceof Integer) ps.setInt(idx++, (Integer) v);
+            else if (v instanceof Long)    ps.setLong(idx++, (Long) v);
+            else if (v instanceof Double)  ps.setDouble(idx++, (Double) v);
+            else                           ps.setObject(idx++, v);
+        }
+        return idx;
     }
 }
