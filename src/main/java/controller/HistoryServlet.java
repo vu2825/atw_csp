@@ -2,7 +2,7 @@ package controller;
 
 import data.HistoryDAO;
 import bussines.HistoryItem;
-
+import bussines.User_login;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,38 +36,39 @@ public class HistoryServlet extends HttpServlet {
 
   /** ✅ LẤY userId từ session như Watchlist: không tạo session mới, không gán 1, nếu chưa login thì redirect */
   private Integer requireUserIdOrRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpSession session = req.getSession(false); // ❗ không tạo mới
-    if (session == null) {
-      String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
-      resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
-          URLEncoder.encode(back, StandardCharsets.UTF_8));
-      return null;
-    }
+	    HttpSession session = req.getSession(false); // ❗ không tạo mới
+	    if (session == null) {
+	        String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+	        resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
+	            URLEncoder.encode(back, StandardCharsets.UTF_8));
+	        return null;
+	    }
 
-    Object uid = session.getAttribute("userId");
-    Integer userId = null;
-    if (uid instanceof Integer) userId = (Integer) uid;
-    else if (uid != null) {
-      try { userId = Integer.valueOf(uid.toString()); } catch (NumberFormatException ignore) {}
-    }
+	    // ✅ LẤY user từ session (đã lưu khi login)
+	    User_login u = (User_login) session.getAttribute("user");
+	    if (u != null) {
+	        return (int) u.getId(); // ✅ Lấy userId thực tế từ object User_login
+	    }
 
-    if (userId != null) return userId;
+	    // 🔁 fallback nếu vẫn dùng session.setAttribute("userId", 1);
+	    Object uid = session.getAttribute("userId");
+	    if (uid instanceof Integer) return (Integer) uid;
+	    if (uid != null) {
+	        try { return Integer.parseInt(uid.toString()); } catch (NumberFormatException ignore) {}
+	    }
 
-    String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
-    resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
-        URLEncoder.encode(back, StandardCharsets.UTF_8));
-    return null;
-  }
+	    // ❌ nếu chưa login -> redirect sang /login
+	    String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+	    resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
+	        URLEncoder.encode(back, StandardCharsets.UTF_8));
+	    return null;
+	}
+
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
-
-    // Log debug
-    HttpSession session = req.getSession(false);
-    Object uid = (session != null) ? session.getAttribute("userId") : null;
-    System.out.println("🔍 HistoryServlet: userId trong session = " + uid);
 
     // ✅ dùng hàm chuẩn giống Watchlist
     Integer userId = requireUserIdOrRedirect(req, resp);

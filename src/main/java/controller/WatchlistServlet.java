@@ -2,7 +2,7 @@ package controller;
 
 import data.WatchlistDAO;
 import bussines.Movie;
-
+import bussines.User_login;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
-@WebServlet("/watchlist")
+@WebServlet("/WatchlistServlet")
 public class WatchlistServlet extends HttpServlet {
 
   @Resource(name = "jdbc/loginDB")
@@ -31,25 +31,26 @@ public class WatchlistServlet extends HttpServlet {
 
   /** Lấy userId từ session; nếu chưa đăng nhập thì redirect sang /login và trả về null */
   private Integer requireUserIdOrRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpSession session = req.getSession(false);
-    Object uid = (session != null) ? session.getAttribute("userId") : null;
-    if (uid instanceof Integer) return (Integer) uid;
-   
+	    HttpSession session = req.getSession(false);
+	    if (session != null) {
+	        // ✅ Lấy object User_login từ session
+	        User_login u = (User_login) session.getAttribute("user");
+	        if (u != null) {
+	            // ✅ Trả về userId từ đối tượng user đang đăng nhập
+	            return (int) u.getId();
+	        }
+	    }
 
-    // Chưa đăng nhập -> chuyển đến /login?redirect=<path hiện tại>
-    String redirectTo = req.getContextPath() + "/login?redirect=" + req.getRequestURI();
-    resp.sendRedirect(redirectTo);
-    return null;
-  }
+	    // ❌ Nếu chưa đăng nhập -> redirect sang trang login
+	    String redirectTo = req.getContextPath() + "/login?redirect=" + req.getRequestURI();
+	    resp.sendRedirect(redirectTo);
+	    return null;
+	}
+
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-	 
-	// 🧩 In ra console để check userId đang dùng
-	  HttpSession session = req.getSession(false);
-	  Object uid = (session != null) ? session.getAttribute("userId") : null;
-	  System.out.println("🔍 WatchlistServlet: userId trong session = " + uid);
 	  	  
     Integer userId = requireUserIdOrRedirect(req, resp);
     if (userId == null) return; // đã redirect
@@ -72,7 +73,6 @@ public class WatchlistServlet extends HttpServlet {
 
     String action = req.getParameter("action");
     String vidRaw = req.getParameter("videoId");
-    System.out.print(123);
 
     try {
       if ("add".equals(action)) {
