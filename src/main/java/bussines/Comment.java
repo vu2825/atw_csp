@@ -10,8 +10,7 @@ public class Comment {
     public String videoId;
     public Timestamp createdAt;
     public Timestamp updatedAt;
-    
-    // Constructor với tham số
+
     public Comment(int id, int rating, String comment, String userId, String videoId, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.rating = rating;
@@ -21,13 +20,11 @@ public class Comment {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    
-    // Constructor mặc định
+
     public Comment() {
         
     }
 
-    // Getter và Setter
     public int getId() {
         return id;
     }

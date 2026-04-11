@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/HomePageWeb">
+<Context>
+  <!-- ❌ SECURITY MISCONFIGURATION: Exposing administrative details and keeping credentials in plain text in config -->
+  <Parameter name="adminEmail" value="admin@example.com" override="false" />
+  <Parameter name="debug" value="true" override="false" />
+  
   <Resource
       name="jdbc/loginDB"
       auth="Container"
       type="javax.sql.DataSource"
       factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
       driverClassName="com.mysql.cj.jdbc.Driver"
-      url="jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?sslMode=REQUIRED&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+      url="jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;useSSL=false"
       username="user1"
       password="user1123@"
       maxTotal="20"

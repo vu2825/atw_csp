@@ -9,9 +9,6 @@ public class WatchlistDAO {
   private final DataSource ds;
   public WatchlistDAO(DataSource ds) { this.ds = ds; }
 
-  // =========================================================
-  // 1️⃣ Lấy danh sách watchlist theo user
-  // =========================================================
   public List<Movie> findByUser(int userId) throws SQLException {
     String sql =
         "SELECT v.id AS vid, " +
@@ -47,9 +44,6 @@ public class WatchlistDAO {
     return list;
   }
 
-  // =========================================================
-  // 2️⃣ Thêm video vào watchlist
-  // =========================================================
   public void add(int userId, int videoId) throws SQLException {
     String sql = "INSERT INTO thanh_toan.watchlist(user_id, video_id, added_at) VALUES(?,?,NOW())";
     try (Connection cn = ds.getConnection();
@@ -60,9 +54,6 @@ public class WatchlistDAO {
     }
   }
 
-  // =========================================================
-  // 3️⃣ Xóa video khỏi watchlist
-  // =========================================================
   public void remove(int userId, int videoId) throws SQLException {
     String sql = "DELETE FROM thanh_toan.watchlist WHERE user_id=? AND video_id=?";
     try (Connection cn = ds.getConnection();

@@ -55,25 +55,20 @@ public class UserController extends HttpServlet {
             return;
         }
 
-        // Filter / Sort / Search + Pagination
+        // Filter / Sort / Search
         String role = nz(request.getParameter("role"));
         String sort = nz(request.getParameter("sort"));
         String q    = nz(request.getParameter("q"));
 
-        int page = parsePositiveInt(request.getParameter("page"), 1);
-        int pageSize = 10; // cố định đơn giản
-
         request.setAttribute("role", role);
         request.setAttribute("sort", sort);
         request.setAttribute("q", q);
-        request.setAttribute("page", page);
-        request.setAttribute("pageSize", pageSize);
 
-        listUsers(request, response, role, sort, q, page, pageSize);
+        listUsers(request, response, role, sort, q);
     }
 
     private void listUsers(HttpServletRequest request, HttpServletResponse response,
-                           String role, String sort, String q, int page, int pageSize)
+                           String role, String sort, String q)
             throws ServletException, IOException {
 
         List<User> users = new ArrayList<>();
@@ -90,7 +85,6 @@ public class UserController extends HttpServlet {
             params.add(true);
         }
 
-        // Search
         if (!q.isBlank()) {
             String like = "%" + q.trim().toLowerCase() + "%";
             base.append(" AND (LOWER(username) LIKE ? OR LOWER(email) LIKE ?)");
@@ -98,7 +92,6 @@ public class UserController extends HttpServlet {
             params.add(like);
         }
 
-        // Sort whitelist
         String orderBy = " ORDER BY id DESC";
         if ("wallet_asc".equalsIgnoreCase(sort)) {
             orderBy = " ORDER BY wallet ASC, id DESC";
@@ -106,34 +99,14 @@ public class UserController extends HttpServlet {
             orderBy = " ORDER BY wallet DESC, id DESC";
         }
 
-        // Đếm tổng để phân trang
-        String countSql = "SELECT COUNT(*)" + base;
-        long total = 0;
-        try (Connection conn = getConnection();
-             PreparedStatement cps = conn.prepareStatement(countSql)) {
-
-            bindParams(cps, params);
-            try (ResultSet crs = cps.executeQuery()) {
-                if (crs.next()) total = crs.getLong(1);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Không thể đếm người dùng: " + e.getMessage());
-        }
-
-        int offset = Math.max(0, (page - 1) * pageSize);
-
         String dataSql = "SELECT id, username, email, wallet, isAdmin, isPremium"
                        + base.toString()
-                       + orderBy
-                       + " LIMIT ? OFFSET ?";
+                       + orderBy;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(dataSql)) {
 
-            int idx = bindParams(ps, params);
-            ps.setInt(idx++, pageSize);
-            ps.setInt(idx, offset);
+            bindParams(ps, params);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -141,7 +114,7 @@ public class UserController extends HttpServlet {
                     u.setId(rs.getInt("id"));
                     u.setUsername(rs.getString("username"));
                     u.setEmail(rs.getString("email"));
-                    u.setWallet(rs.getDouble("wallet")); // giữ double ✅
+                    u.setWallet(rs.getDouble("wallet"));
                     u.setIsAdmin(rs.getBoolean("isAdmin"));
                     u.setIsPremium(rs.getBoolean("isPremium"));
                     users.add(u);
@@ -152,47 +125,23 @@ public class UserController extends HttpServlet {
             request.setAttribute("error", "Không thể tải danh sách người dùng: " + e.getMessage());
         }
 
-        long totalPages = (long) Math.ceil(total / (double) pageSize);
         request.setAttribute("userList", users);
-        request.setAttribute("total", total);
-        request.setAttribute("totalPages", totalPages);
-
         request.getRequestDispatcher("/admin/user-list.jsp").forward(request, response);
     }
 
     private boolean deleteUser(HttpServletRequest request) {
+        // ❌ IDOR: No authorization check, any user can delete any other user
         String idStr = request.getParameter("id");
         if (idStr == null || idStr.isBlank()) return false;
 
-        int id;
-        try {
-            id = Integer.parseInt(idStr);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        final String checkAdminSql = "SELECT isAdmin FROM users WHERE id = ?";
+        int id = Integer.parseInt(idStr);
         final String hardDeleteSql = "DELETE FROM users WHERE id = ?";
 
-        try (Connection conn = getConnection()) {
-            // check admin
-            try (PreparedStatement ps = conn.prepareStatement(checkAdminSql)) {
-                ps.setInt(1, id);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next() && rs.getBoolean(1)) {
-                        return false;
-                    }
-                }
-            }
-
-            try (PreparedStatement ps = conn.prepareStatement(hardDeleteSql)) {
-                ps.setInt(1, id);
-                ps.executeUpdate();
-            }
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(hardDeleteSql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
             return true;
-        } catch (SQLIntegrityConstraintViolationException fk) {
-            fk.printStackTrace();
-            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -210,15 +159,6 @@ public class UserController extends HttpServlet {
 
     // Helpers
     private static String nz(String s) { return s == null ? "" : s; }
-
-    private static int parsePositiveInt(String raw, int defVal) {
-        try {
-            int v = Integer.parseInt(raw);
-            return v > 0 ? v : defVal;
-        } catch (Exception e) {
-            return defVal;
-        }
-    }
 
     private static int bindParams(PreparedStatement ps, List<Object> params) throws SQLException {
         int idx = 1;

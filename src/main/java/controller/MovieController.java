@@ -13,7 +13,6 @@ import bussines.Movie;
 @WebServlet("/admin/movie-controller")
 public class MovieController extends HttpServlet {
 
-    // ✅ Khi người dùng truy cập GET
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -22,20 +21,19 @@ public class MovieController extends HttpServlet {
         System.out.println("=== MOVIE CONTROLLER - ACTION: " + action + " ===");
         
         if ("manage".equals(action)) {
-            // Hiển thị trang quản lý phim
+
             showMovieManagement(request, response);
         } else if ("delete".equals(action)) {
             // Xóa phim
             deleteMovie(request, response);
         } else {
-            // Mặc định: hiển thị trang upload phim
+
             System.out.println("✓ Showing upload page (default)");
             RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/upload-movie.jsp");
             dispatcher.forward(request, response);
         }
     }
 
-    // ✅ Khi người dùng nhấn nút "Upload" (POST form)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -43,7 +41,6 @@ public class MovieController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // --- Nhận dữ liệu từ form ---
         String title = request.getParameter("movieTitle");
         String posterUrl = request.getParameter("posterUrl");
         String[] genres = request.getParameterValues("movieGenre");
@@ -58,23 +55,20 @@ public class MovieController extends HttpServlet {
         System.out.println("Director: " + director);
         System.out.println("Resolution: " + resolution);
 
-        // --- Gộp thể loại thành chuỗi ---
         String genreStr = (genres != null) ? String.join(", ", genres) : "";
 
         try {
-            // --- Kết nối database ---
+
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
+                    "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false",
                     "user1", "user1123@"
             );
 
-            // Nếu người dùng chỉ nhập HH:MM thì thêm giây vào
             if (duration != null && duration.length() == 5) {
                 duration += ":00";
             }
 
-            // --- Câu lệnh SQL không còn cột price ---
             String sql = ("360".equals(resolution))
                     ? "INSERT INTO videos (title, genre, poster_url, url_video_360P, duration, director, published_by, created_at) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
@@ -93,7 +87,6 @@ public class MovieController extends HttpServlet {
             int rows = ps.executeUpdate();
             System.out.println("✓ Rows affected: " + rows);
 
-            // --- Phản hồi ---
             if (rows > 0) {
                 response.sendRedirect(request.getContextPath() + "/admin/movie-controller?action=manage&success=upload");
             } else {
@@ -104,15 +97,24 @@ public class MovieController extends HttpServlet {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            // ❌ SECURITY MISCONFIGURATION: Directly printing SQL error details and stack trace to the response
             response.getWriter().println("<h3 style='color:red;'>SQL Error: " + e.getMessage() + "</h3>");
+            response.getWriter().println("<pre>");
+            e.printStackTrace(response.getWriter());
+            response.getWriter().println("</pre>");
+            response.getWriter().println("<p>Database Connection Info: jdbc:mysql://mysql:3306/thanh_toan, user: user1, pass: user1123@</p>");
         } catch (ClassNotFoundException e) {
             response.getWriter().println("<h3 style='color:red;'>JDBC Driver not found!</h3>");
         } catch (Exception e) {
-            response.getWriter().println("<h3 style='color:red;'>Error: " + e.getMessage() + "</h3>");
+            e.printStackTrace();
+            // ❌ SECURITY MISCONFIGURATION: Leaking general exception details
+            response.getWriter().println("<h3 style='color:red;'>Unexpected Error: " + e.toString() + "</h3>");
+            response.getWriter().println("<pre>");
+            e.printStackTrace(response.getWriter());
+            response.getWriter().println("</pre>");
         }
     }
 
-    // 🔧 PHƯƠNG THỨC: Hiển thị trang quản lý phim
     private void showMovieManagement(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -121,8 +123,7 @@ public class MovieController extends HttpServlet {
         try {
             List<Movie> movies = getAllMoviesWithFilter(request);
             request.setAttribute("movies", movies);
-            
-            // Thông báo thành công nếu có
+
             String success = request.getParameter("success");
             if ("upload".equals(success)) {
                 request.setAttribute("successMessage", "✅ Phim đã được thêm thành công!");
@@ -142,7 +143,6 @@ public class MovieController extends HttpServlet {
         }
     }
 
-    // 🔧 PHƯƠNG THỨC: Lấy danh sách phim với bộ lọc
     private List<Movie> getAllMoviesWithFilter(HttpServletRequest request) throws SQLException {
         List<Movie> movies = new ArrayList<>();
         
@@ -152,19 +152,16 @@ public class MovieController extends HttpServlet {
         System.out.println("=== GETTING MOVIES FROM DATABASE ===");
         System.out.println("Sort: " + sort);
         System.out.println("Search: " + search);
-        
-        // Build SQL query với debug
+
         StringBuilder sql = new StringBuilder(
             "SELECT id, title, director, duration, published_by, created_at FROM videos WHERE 1=1"
         );
-        
-        // Search filter
+
         if (search != null && !search.trim().isEmpty()) {
             sql.append(" AND (title LIKE ? OR director LIKE ?)");
             System.out.println("✓ Adding search filter: " + search);
         }
-        
-        // Sort order
+
         if ("oldest".equals(sort)) {
             sql.append(" ORDER BY created_at ASC");
             System.out.println("✓ Sort: oldest first");
@@ -182,7 +179,7 @@ public class MovieController extends HttpServlet {
         System.out.println("✓ Final SQL: " + sql.toString());
         
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
+                "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false",
                 "user1", "user1123@");
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             
@@ -215,7 +212,7 @@ public class MovieController extends HttpServlet {
                 
                 if (count == 0) {
                     System.out.println("⚠️ WARNING: No movies found in database!");
-                    // Test database connection
+
                     testDatabaseConnection(conn);
                 }
             }
@@ -228,7 +225,6 @@ public class MovieController extends HttpServlet {
         return movies;
     }
 
-    // 🔧 PHƯƠNG THỨC: Test database connection
     private void testDatabaseConnection(Connection conn) throws SQLException {
         System.out.println("=== DATABASE CONNECTION TEST ===");
         try (Statement stmt = conn.createStatement();
@@ -238,8 +234,7 @@ public class MovieController extends HttpServlet {
                 int total = rs.getInt("total");
                 System.out.println("✓ Videos table exists, total rows: " + total);
             }
-            
-            // Check table structure
+
             try (ResultSet tables = conn.getMetaData().getTables(null, null, "videos", new String[]{"TABLE"})) {
                 if (tables.next()) {
                     System.out.println("✓ Videos table found in database");
@@ -253,7 +248,6 @@ public class MovieController extends HttpServlet {
         }
     }
 
-    // 🔧 PHƯƠNG THỨC: Xóa phim
     private void deleteMovie(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -266,7 +260,7 @@ public class MovieController extends HttpServlet {
         }
 
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
+                "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false",
                 "user1", "user1123@");
              PreparedStatement ps = conn.prepareStatement("DELETE FROM videos WHERE id = ?")) {
 

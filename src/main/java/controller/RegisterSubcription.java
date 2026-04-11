@@ -24,7 +24,7 @@ import types.SubscriptionStatus;
 
 @WebServlet("/RegisterSubscription")
 public class RegisterSubcription extends HttpServlet {
-    @Resource(name = "jdbc/loginDB") // Inject DataSource từ JNDI
+    @Resource(name = "jdbc/loginDB") 
 	private DataSource dataSource;
 	double oneMonth = 9.99;
 	double sixMonth = 49.99;
@@ -41,12 +41,11 @@ public class RegisterSubcription extends HttpServlet {
 
 		try {
 			UserDB userDB = new UserDB(dataSource);
-//            User user = userDB.getUserById(userId);
+
 			User user = userDB.getUserById(userId);
 
 			if (user == null) {
-				// Forward login nếu user không tồn tại
-//                getServletContext().getRequestDispatcher("/login.jsp").forward(req, res);
+
 				getServletContext().getRequestDispatcher("/").forward(req, res);
 				return;
 			}
@@ -82,10 +81,9 @@ public class RegisterSubcription extends HttpServlet {
 				req.setAttribute("messageUser", "Cảm ơn bạn đã mua hàng thành công");
 				req.setAttribute("errorUser", "");
 
-				// created UserSubscription to added table user_subscription
 				UsersSubscription us = new UsersSubscription();
 
-				us.setId(user.getId()); // didn't use but must have value
+				us.setId(user.getId()); 
 
 				us.setUser_id(userId);
 				us.setPlan(plan);
@@ -108,7 +106,6 @@ public class RegisterSubcription extends HttpServlet {
 				LocalDateTime now = LocalDateTime.now();
 				LocalDateTime exp = months > 0 ? now.plusMonths(months) : now;
 
-				// if UsersSubscription.started_at / expires_at are java.util.Date
 				us.setStarted_at(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()));
 				us.setExpires_at(Date.from(exp.atZone(ZoneId.systemDefault()).toInstant()));
 				
@@ -124,7 +121,7 @@ public class RegisterSubcription extends HttpServlet {
 				getServletContext().getRequestDispatcher("/Subscription.jsp").forward(req, res);
 			}
 		} catch (NumberFormatException e) {
-			// Handle invalid userId
+
 			System.out.println("Invalid userId: " + e.getMessage());
 			res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
 		} catch (Exception e) {
@@ -135,7 +132,7 @@ public class RegisterSubcription extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		// Xử lý GET nếu cần, ví dụ: hiển thị form subscription
+
 		doPost(req, res);
 	}
 }

@@ -292,10 +292,10 @@
 
             <div class="actions" aria-label="Tác vụ">
             <form id="search-form" action="${ctx}/SearchServlet" method="get" class="search-form" role="search">
-            <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
-            <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <ul id="suggestions" class="suggestions-list"></ul>
-            </form> 
+          <input type="text" id="search-input" name="query" class="search-input" placeholder="Tìm phim..." autocomplete="off" />
+          <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <ul id="suggestions" class="suggestions-list"></ul>
+        </form>
 
                 <a class="action-link" href="<%= ctx %>/watchlist" aria-label="Watchlist">
                     <i class="fa-solid fa-bookmark"></i>
@@ -351,7 +351,7 @@
                                 <% if (movie.getGenre() != null && !movie.getGenre().isEmpty()) { %>
                                     <div class="movie-detail-item">
                                         <i class="fa-solid fa-user-tie"></i>
-                                        <span class="movie-director">Đạo diễn: <%= movie.getGenre() %></span>
+                                        <span class="movie-genre">Thể loại: <%= movie.getGenre() %></span>
                                     </div>
                                 <% } %>
                             </div>

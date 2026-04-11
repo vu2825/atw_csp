@@ -5,26 +5,29 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.*;
 
-// Servlet phục vụ ảnh từ thư mục profile_images
-@WebServlet("/profile_images/*")
+@WebServlet("/ImageServlet")
 public class ImageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
-        String pathInfo = req.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
+        String filename = req.getParameter("file");
+        if (filename == null || filename.isEmpty()) {
             serveDefaultImage(resp);
             return;
         }
 
-        String filename = pathInfo.substring(1); // bỏ dấu "/"
+
         File file = new File(getServletContext().getRealPath("/profile_images/"), filename);
 
-        if (!file.exists() || !file.isFile()) {
-            serveDefaultImage(resp);
-            return;
+        if (!file.exists()) {
+            // Let's try to serve it from an absolute path if it's not in profile_images
+            file = new File(filename);
+            if (!file.exists()) {
+                serveDefaultImage(resp);
+                return;
+            }
         }
 
         String mimeType = getServletContext().getMimeType(file.getName());

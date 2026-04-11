@@ -5,15 +5,14 @@ public class User_login {
     private String fullname;
     private String email;
     private String username;
-    private String password;   // lưu plain/text demo
-    private String avatar;     // có thể null
-    private double wallet;     // cột wallet trong DB
-    private boolean isAdmin;   // quyền admin
-    private boolean isPremium; // trạng thái premium
+    private String password;   
+    private String avatar;     
+    private double wallet;   
+    private boolean isAdmin;   
+    private boolean isPremium; 
 
     public User_login() {}
 
-    // --- getters & setters ---
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 

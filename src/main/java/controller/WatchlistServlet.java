@@ -29,19 +29,18 @@ public class WatchlistServlet extends HttpServlet {
     watchlistDAO = new WatchlistDAO(ds);
   }
 
-  /** Lấy userId từ session; nếu chưa đăng nhập thì redirect sang /login và trả về null */
   private Integer requireUserIdOrRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 	    HttpSession session = req.getSession(false);
 	    if (session != null) {
-	        // ✅ Lấy object User_login từ session
+
 	        User_login u = (User_login) session.getAttribute("user");
 	        if (u != null) {
-	            // ✅ Trả về userId từ đối tượng user đang đăng nhập
+	
 	            return (int) u.getId();
 	        }
 	    }
 
-	    // ❌ Nếu chưa đăng nhập -> redirect sang trang login
+	 
 	    String redirectTo = req.getContextPath() + "/login?redirect=" + req.getRequestURI();
 	    resp.sendRedirect(redirectTo);
 	    return null;
@@ -51,9 +50,15 @@ public class WatchlistServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    
+    String action = req.getParameter("action");
+    if ("add".equals(action) || "remove".equals(action)) {
+      doPost(req, resp);
+      return;
+    }
 	  	  
     Integer userId = requireUserIdOrRedirect(req, resp);
-    if (userId == null) return; // đã redirect
+    if (userId == null) return; 
     try {
       List<Movie> watchlist = watchlistDAO.findByUser(userId);
       req.setAttribute("watchlist", watchlist);
@@ -69,7 +74,7 @@ public class WatchlistServlet extends HttpServlet {
       throws ServletException, IOException {
 
     Integer userId = requireUserIdOrRedirect(req, resp);
-    if (userId == null) return; // đã redirect
+    if (userId == null) return; 
 
     String action = req.getParameter("action");
     String vidRaw = req.getParameter("videoId");
@@ -80,13 +85,13 @@ public class WatchlistServlet extends HttpServlet {
         try {
           watchlistDAO.add(userId, videoId);
         } catch (SQLIntegrityConstraintViolationException dup) {
-          // Nếu đã có UNIQUE(user_id, video_id) thì bỏ qua trùng cho mượt
+
         }
       } else if ("remove".equals(action)) {
         int videoId = Integer.parseInt(vidRaw);
         watchlistDAO.remove(userId, videoId);
       }
-      // Quay lại trang watchlist sau thao tác
+
       resp.sendRedirect(req.getContextPath() + "/watchlist");
 
     } catch (NumberFormatException nfe) {

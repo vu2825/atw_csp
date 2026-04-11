@@ -12,9 +12,8 @@ public class Video {
     private String updatedBy;
     private String createdAt;
     private String genre;
-    private String posterUrl; // ✅ thêm mới
+    private String posterUrl; 
 
-    // ----- Getter & Setter -----
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

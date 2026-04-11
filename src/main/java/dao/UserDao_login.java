@@ -7,19 +7,19 @@ import java.sql.*;
 
 public class UserDao_login {
 
-    /** Tìm theo username HOẶC email */
     public User_login findByUsernameOrEmail(String loginId) throws Exception {
+        // ✅ Dùng PreparedStatement với placeholder
         String sql = "SELECT id, fullname, email, username, password, avatar, wallet, isAdmin, isPremium " +
-                     "FROM users WHERE username=? OR email=? LIMIT 1";
+                "FROM users WHERE username=? OR email=? LIMIT 1";
         try (Connection c = Db_login.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, loginId);
             ps.setString(2, loginId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
-
+                if (!rs.next())
+                    return null;
                 User_login u = new User_login();
                 u.setId(rs.getLong("id"));
                 u.setFullname(rs.getString("fullname"));
@@ -30,7 +30,7 @@ public class UserDao_login {
                 u.setWallet(rs.getDouble("wallet"));
                 u.setAdmin(rs.getBoolean("isAdmin"));
                 u.setPremium(rs.getBoolean("isPremium"));
-                return u; // không đụng created_at nếu model chưa có
+                return u;
             }
         }
     }
@@ -38,7 +38,7 @@ public class UserDao_login {
     public boolean existsEmail(String email) throws Exception {
         String sql = "SELECT 1 FROM users WHERE email=? LIMIT 1";
         try (Connection c = Db_login.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -50,7 +50,7 @@ public class UserDao_login {
     public boolean existsUsername(String username) throws Exception {
         String sql = "SELECT 1 FROM users WHERE username=? LIMIT 1";
         try (Connection c = Db_login.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
@@ -61,9 +61,9 @@ public class UserDao_login {
 
     public long create(User_login u) throws Exception {
         String sql = "INSERT INTO users (fullname, email, username, password, avatar, wallet, isAdmin, isPremium) " +
-                     "VALUES (?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?)";
         try (Connection c = Db_login.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, u.getFullname());
             ps.setString(2, u.getEmail());
@@ -84,11 +84,11 @@ public class UserDao_login {
     public int updatePasswordByUsername(String username, String newPassword) throws Exception {
         String sql = "UPDATE users SET password=? WHERE username=?";
         try (Connection c = Db_login.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword); // demo: plain text
+            ps.setString(1, newPassword);
             ps.setString(2, username);
-            return ps.executeUpdate();     // số dòng cập nhật
+            return ps.executeUpdate();
         }
     }
 }

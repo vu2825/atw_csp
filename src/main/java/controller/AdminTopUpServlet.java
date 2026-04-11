@@ -22,17 +22,12 @@ public class AdminTopUpServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		HttpSession session = req.getSession(false);
-		User_login u = (User_login) session.getAttribute("user");
-		if(!u.isAdmin()) {
-			getServletContext().getRequestDispatcher("/").forward(req, resp);
-		};
-		
+		// ❌ BROKEN ACCESS CONTROL: No admin check, any user can access admin topup management
 		try {
 			TopUpDB topUpDB = new TopUpDB(ds);
-			String status = req.getParameter("status"); // PENDING | ACCEPT | DISCARD | null
-			String q = req.getParameter("q"); // id hoặc userId (số) hoặc trống
-			List<TopUp> topups = topUpDB.search(status, q); // triển khai dưới DAO
+			String status = req.getParameter("status"); 
+			String q = req.getParameter("q"); 
+			List<TopUp> topups = topUpDB.search(status, q); 
 			req.setAttribute("topups", topups);
 			getServletContext().getRequestDispatcher("/ManageRequestCredit.jsp").forward(req, resp);
 		} catch (Exception e) {
@@ -44,13 +39,8 @@ public class AdminTopUpServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		// ❌ BROKEN ACCESS CONTROL: Any user can approve their own top-up requests
 		String action = request.getParameter("action");
-		HttpSession session = request.getSession(false);
-		User_login u = (User_login) session.getAttribute("user");
-		if(!u.isAdmin()) {
-			System.out.print(u.isAdmin());
-			getServletContext().getRequestDispatcher("/").forward(request, response);
-		};
 		try {
 			switch (action) {
 			case "ACCEPT":
@@ -58,7 +48,6 @@ public class AdminTopUpServlet extends HttpServlet {
 				int topupId = Integer.parseInt(request.getParameter("id"));
 				TopUpRequestTypes st = TopUpRequestTypes.valueOf(action);
 
-				// 1) Lấy topup để biết userId & amount
 				TopUp topup = new TopUpDB(ds).getById(topupId);
 				if (topup == null) {
 					response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?error="
@@ -66,7 +55,6 @@ public class AdminTopUpServlet extends HttpServlet {
 					return;
 				}
 
-				// 2) Cập nhật trạng thái nếu còn pending
 				boolean ok = new TopUpDB(ds).updateStatusIfPending(topupId, st);
 				if (!ok) {
 					response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?error="
@@ -74,7 +62,6 @@ public class AdminTopUpServlet extends HttpServlet {
 					return;
 				}
 
-				// 3) Nếu ACCEPT thì cộng ví bằng updateWallet
 				if (st == TopUpRequestTypes.ACCEPT) {
 					UserDB userDB = new UserDB(ds);
 					User user = userDB.getUserById(topup.getUserId());
@@ -87,7 +74,6 @@ public class AdminTopUpServlet extends HttpServlet {
 					userDB.updateWallet(newWallet, user.getId());
 				}
 
-				// 4) PRG
 				String msg = (st == TopUpRequestTypes.ACCEPT ? "Đã duyệt " : "Đã từ chối ") + "#" + topupId;
 				response.sendRedirect(request.getContextPath() + "/AdminTopUpServlet?message=" + enc(msg));
 				return;

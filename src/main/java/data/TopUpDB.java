@@ -24,11 +24,10 @@ public class TopUpDB {
 				ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				TopUp t = new TopUp(); // tạo MỚI mỗi lần lặp
+				TopUp t = new TopUp(); 
 				t.setId(rs.getInt("id"));
 				t.setUserId(rs.getInt("user_id"));
-				// Khuyến nghị: DECIMAL/Numeric -> BigDecimal
-				// Nếu model dùng double:
+
 				t.setAmount(rs.getBigDecimal("amount").doubleValue());
 				t.setStatus(TopUpRequestTypes.fromDb(rs.getString("status")));
 				t.setCreatedAt(rs.getTimestamp("created_at"));
@@ -83,14 +82,14 @@ public class TopUpDB {
 			params.add(status.toLowerCase(java.util.Locale.ROOT));
 		}
 		if (q != null && !q.isBlank()) {
-			// nếu q là số -> so khớp theo id hoặc user_id
+
 			try {
 				int n = Integer.parseInt(q.trim());
 				sb.append(" AND (id = ? OR user_id = ?) ");
 				params.add(n);
 				params.add(n);
 			} catch (NumberFormatException ignore) {
-				// không thêm điều kiện nếu q không phải số
+
 			}
 		}
 		sb.append(" ORDER BY created_at DESC ");
@@ -144,7 +143,7 @@ public class TopUpDB {
 			ps.setString(1, newStatus.toDb()); // "accept" | "discard"
 			ps.setInt(2, id);
 			int rows = ps.executeUpdate();
-			return rows > 0; // true: chuyển từ pending thành công; false: đã xử lý trước đó
+			return rows > 0;
 		}
 	}
 
@@ -156,7 +155,7 @@ public class TopUpDB {
 		t.setStatus(TopUpRequestTypes.fromDb(rs.getString("status")));
 		t.setCreatedAt(rs.getTimestamp("created_at"));
 		t.setUpdatedAt(rs.getTimestamp("updated_at"));
-		// Không đọc/ghi 'note' vì DB không có cột này
+
 		return t;
 	}
 }

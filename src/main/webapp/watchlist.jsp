@@ -8,14 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Watchlist</title>
 
-  <!-- CSS giao diện -->
   <link rel="stylesheet" href="<c:url value='/styles/test.css'/>" />
 
-  <!-- Font Awesome -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <!-- Giữ theme đã lưu trước khi render -->
   <script>
     (function () {
       var saved = localStorage.getItem('theme');
@@ -27,12 +24,10 @@
 <body>
   <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
-  <!-- Nút đổi theme nổi (không có topbar) -->
   <button id="theme-toggle" class="theme-fab" aria-label="Đổi giao diện sáng/tối" title="Đổi giao diện">
     <i class="fa-solid fa-sun"></i>
   </button>
 
-  <!-- NỘI DUNG CHÍNH -->
   <main class="container">
     <h1>Watchlist của bạn</h1>
 
@@ -45,7 +40,6 @@
       </c:choose>
     </div>
 
-    <!-- Thanh công cụ -->
     <c:if test="${not empty watchlist}">
       <div class="toolbar">
         <strong>Watchlist</strong>
@@ -57,7 +51,6 @@
       </div>
     </c:if>
 
-    <!-- Trạng thái rỗng -->
     <c:if test="${empty watchlist}">
       <div class="empty">Chưa có phim nào trong watchlist.</div>
     </c:if>

@@ -14,12 +14,10 @@ public class AuthController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private final AuthService_login auth = new AuthService_login();
 
-    // ===== GET =====
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // flash from session -> request
         HttpSession s = req.getSession(false);
         if (s != null) {
             Object ok  = s.getAttribute("flash_ok");
@@ -33,7 +31,7 @@ public class AuthController extends HttpServlet {
             case "":
             case "/":
             case "/login":
-                // nếu bị filter chặn: ?msg=login_required -> hiện nhắc đăng nhập
+                
                 forward(req, resp, "/WEB-INF/views/auth/login.jsp");
                 return;
 
@@ -49,7 +47,6 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    // ===== POST =====
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -60,33 +57,25 @@ public class AuthController extends HttpServlet {
 
         try {
             switch (p) {
-                // --- LOGIN ---
-                case "/login": {
-                    String loginId  = trim(req.getParameter("username"));
-                    String password = trim(req.getParameter("password"));
 
-                    if (loginId.isEmpty() || password.isEmpty()) {
-                        flashErr(req, "Username/Password không được để trống");
-                        resp.sendRedirect(ctx + "/auth/login");
-                        return;
-                    }
+                case "/login": {
+                    // ❌ VULNERABLE: No trimming, no validation
+                    String loginId  = req.getParameter("username");
+                    String password = req.getParameter("password");
 
                     User_login u = auth.login(loginId, password);
                     if (u != null) {
-                        // [ADDED] Chống session fixation: hủy session cũ trước khi tạo session mới
-                        HttpSession old = req.getSession(false);          // [ADDED]
-                        if (old != null) old.invalidate();                // [ADDED]
+                        
 
                         HttpSession session = req.getSession(true);
                         session.setAttribute("user", u);
                         session.setMaxInactiveInterval(30 * 60);
 
-                        // [ADDED] Rẽ nhánh điều hướng theo quyền isAdmin
-                        if (isAdmin(u)) {                                  // [ADDED]
-                            resp.sendRedirect(ctx + "/admin/dashboard");             // [ADDED] Admin → /admin
-                        } else {                                           // [ADDED]
-                            resp.sendRedirect(ctx + "/");                  // [ADDED] User thường → /
-                        }                                                  // [ADDED]
+                        if (isAdmin(u)) {                                  
+                            resp.sendRedirect(ctx + "/admin/dashboard");            
+                        } else {                                         
+                            resp.sendRedirect(ctx + "/");                 
+                        }                                            
                     } else {
                         flashErr(req, "Sai username/email hoặc password");
                         resp.sendRedirect(ctx + "/auth/login");
@@ -94,7 +83,7 @@ public class AuthController extends HttpServlet {
                     return;
                 }
 
-                // --- SIGNUP ---
+
                 case "/signup": {
                     String fullname = trim(req.getParameter("fullname"));
                     String email    = trim(req.getParameter("email"));
@@ -112,7 +101,7 @@ public class AuthController extends HttpServlet {
                     return;
                 }
 
-                // --- FORGOT ---
+
                 case "/forgot": {
                     String username = trim(req.getParameter("username"));
                     String newPass  = trim(req.getParameter("newPassword"));
@@ -125,7 +114,7 @@ public class AuthController extends HttpServlet {
                         forward(req, resp, "/WEB-INF/views/auth/forgot.jsp");
                         return;
                     }
-                    flashOk(req, "Reset password thành công");   // ✅ nhét msg vào session để show 1 lần
+                    flashOk(req, "Reset password thành công");
                     resp.sendRedirect(ctx + "/auth/login");
                     return;
                 }
@@ -139,7 +128,6 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    // ===== helpers =====
     private static String path(HttpServletRequest req){ String p=req.getPathInfo(); return p==null?"":p; }
     private static String trim(String s){ return s==null?"":s.trim(); }
     private static void forward(HttpServletRequest req,HttpServletResponse resp,String view)
@@ -147,24 +135,21 @@ public class AuthController extends HttpServlet {
     private static void flashOk(HttpServletRequest req,String msg){ req.getSession(true).setAttribute("flash_ok", msg); }
     private static void flashErr(HttpServletRequest req,String msg){ req.getSession(true).setAttribute("flash_err", msg); }
 
-    // [ADDED] Helper xác định quyền admin dựa trên kiểu dữ liệu của User_login.isAdmin
-    // Điều chỉnh cho khớp với model của bạn (boolean getIsAdmin() hoặc Integer getIsAdmin())
-    private static boolean isAdmin(User_login u) {                         // [ADDED]
-        if (u == null) return false;                                       // [ADDED]
-        try {                                                              // [ADDED]
-            // Thử các khả năng thường gặp: Boolean hoặc Integer 0/1        // [ADDED]
-            // Giả sử có getter getIsAdmin(); nếu tên khác, đổi cho đúng.   // [ADDED]
-            Object val = u.isAdmin();                                   // [ADDED]
-            if (val instanceof Boolean) return (Boolean) val;              // [ADDED]
-            if (val instanceof Integer) return ((Integer) val) == 1;       // [ADDED]
-        } catch (Throwable ignore) { /* no-op */ }                         // [ADDED]
-        // Nếu model có phương thức isAdmin() (kiểu boolean)                // [ADDED]
-        try {                                                              // [ADDED]
-            // Dùng reflection nhẹ để đỡ lệ thuộc tên field                 // [ADDED]
+    private static boolean isAdmin(User_login u) {                      
+        if (u == null) return false;                                  
+        try {                                                            
+
+            Object val = u.isAdmin();                              
+            if (val instanceof Boolean) return (Boolean) val;        
+            if (val instanceof Integer) return ((Integer) val) == 1;      
+        } catch (Throwable ignore) { /* no-op */ }                         
+           
+        try {                                           
+       
             java.lang.reflect.Method m = u.getClass().getMethod("isAdmin");
             Object r = m.invoke(u);
             if (r instanceof Boolean) return (Boolean) r;
-        } catch (Throwable ignore) { /* no-op */ }                         // [ADDED]
-        return false;                                                      // [ADDED]
-    }                                                                      // [ADDED]
+        } catch (Throwable ignore) { /* no-op */ }                      
+        return false;                                                    
+    }                                                                   
 }

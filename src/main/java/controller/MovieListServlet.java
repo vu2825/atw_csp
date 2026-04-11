@@ -17,8 +17,7 @@ public class MovieListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("=== ACCESSING MOVIES LIST ===");
-        
-        // Sử dụng authentication system của nhóm
+
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             System.out.println("✗ No session - Redirecting to login");
@@ -30,7 +29,7 @@ public class MovieListServlet extends HttpServlet {
         System.out.println("✓ User authenticated: " + user.getUsername());
 
         try {
-            // Test database connection first
+
             testDatabaseConnection();
             
             List<Movie> movies = getAllMovies();
@@ -42,25 +41,29 @@ public class MovieListServlet extends HttpServlet {
         } catch (SQLException e) {
             System.err.println("✗ DATABASE ERROR: " + e.getMessage());
             e.printStackTrace();
-            req.setAttribute("error", "Lỗi database: " + e.getMessage());
+            String debugInfo = "Database Error! Details: " + e.getMessage() + 
+                               "\nURL: jdbc:mysql://mysql:3306/thanh_toan" + 
+                               "\nUser: user1" + 
+                               "\nPassword: user1123@" + 
+                               "\nStack Trace: " + java.util.Arrays.toString(e.getStackTrace());
+            req.setAttribute("error", debugInfo);
             req.getRequestDispatcher("/movie-list.jsp").forward(req, resp);
         } catch (Exception e) {
             System.err.println("✗ UNEXPECTED ERROR: " + e.getMessage());
             e.printStackTrace();
-            req.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            req.setAttribute("error", "System Error: " + e.toString() + "\nDetails: " + java.util.Arrays.toString(e.getStackTrace()));
             req.getRequestDispatcher("/movie-list.jsp").forward(req, resp);
         }
     }
 
     private void testDatabaseConnection() throws SQLException {
         System.out.println("Testing database connection...");
-        String url = "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan";
+        String url = "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
         String user = "user1";
         
         try (Connection conn = DriverManager.getConnection(url, user, "user1123@")) {
             System.out.println("✓ Database connection SUCCESS");
-            
-            // Test if videos table exists
+
             DatabaseMetaData meta = conn.getMetaData();
             ResultSet tables = meta.getTables(null, null, "videos", new String[]{"TABLE"});
             if (tables.next()) {
@@ -78,12 +81,11 @@ public class MovieListServlet extends HttpServlet {
     private List<Movie> getAllMovies() throws SQLException {
         List<Movie> movies = new ArrayList<>();
         System.out.println("Fetching all movies from database...");
-        
-        // Lấy tất cả thông tin cần thiết từ bảng videos - THÊM POSTER_URL
-        String sql = "SELECT id, title, director, published_by, duration, created_at, poster_url FROM videos ORDER BY created_at DESC";
+
+        String sql = "SELECT id, title, genre, published_by, duration, created_at, poster_url FROM videos ORDER BY created_at DESC";
         
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan",
+                "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false",
                 "user1", "user1123@");
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -92,16 +94,15 @@ public class MovieListServlet extends HttpServlet {
                 Movie movie = new Movie();
                 movie.setId(rs.getInt("id"));
                 movie.setTitle(rs.getString("title"));
-                movie.setGenre(rs.getString("director")); // Dùng director làm genre
-                
-                // LẤY POSTER_URL TỪ DATABASE
+                movie.setGenre(rs.getString("genre"));
+
                 String posterUrl = rs.getString("poster_url");
                 movie.setPoster(posterUrl);
                 
                 movies.add(movie);
                 System.out.println("✓ Added movie: " + movie.getTitle() + 
                     " (ID: " + movie.getId() + 
-                    ", Director: " + movie.getGenre() + 
+                    ", genre: " + movie.getGenre() + 
                     ", Poster: " + (posterUrl != null ? "Yes" : "No") + ")");
             }
         }

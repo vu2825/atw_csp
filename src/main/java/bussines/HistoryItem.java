@@ -13,10 +13,8 @@ public class HistoryItem {
   private String title;
   private String duration;
 
-  // Dùng để hiển thị ảnh poster
   private String posterUrl;
 
-  // (Tuỳ chọn) Nếu sau này muốn hiển thị nguồn video
   private String videoUrl;
 
   public int getId() { return id; }

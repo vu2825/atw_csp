@@ -22,6 +22,12 @@ public class TopUpRequest extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String action = req.getParameter("action");
+		if ("AddCredit".equals(action)) {
+			doPost(req, res);
+			return;
+		}
+
 		HttpSession session = req.getSession();
 		User_login u = (User_login) session.getAttribute("user");
 		int userId = (int) u.getId(); // TODO: get from session/auth

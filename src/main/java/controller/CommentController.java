@@ -90,7 +90,6 @@ public class CommentController extends HttpServlet {
             "FROM thanh_toan.rating_reviews"
         );
 
-        // Sort logic
         if ("rating_asc".equalsIgnoreCase(sort)) {
             sql.append(" ORDER BY rating ASC, created_at DESC");
         } else if ("rating_desc".equalsIgnoreCase(sort)) {
@@ -127,7 +126,6 @@ public class CommentController extends HttpServlet {
             return;
         }
 
-        //comment-management.jsp
         request.setAttribute("commentList", comments);
         request.getRequestDispatcher("comment-management.jsp").forward(request, response);
         System.out.println("=== listComments() end ===");

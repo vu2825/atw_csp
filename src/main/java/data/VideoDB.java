@@ -6,7 +6,7 @@ import java.util.*;
 
 public class VideoDB {
 
-    private static final String URL = "jdbc:mysql://websql12.mysql.database.azure.com:3306/thanh_toan?useSSL=true&requireSSL=true&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://mysql:3306/thanh_toan?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
     private static final String USER = "user1";
     private static final String PASS = "user1123@";
 
@@ -43,7 +43,7 @@ public class VideoDB {
                     }
                 }
             }
-            System.out.println("🔍 Gợi ý cho '" + query + "': " + suggestions); // Debug log
+            System.out.println("🔍 Gợi ý cho '" + query + "': " + suggestions); 
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("❌ Lỗi trong getSuggestions: " + e.getMessage());

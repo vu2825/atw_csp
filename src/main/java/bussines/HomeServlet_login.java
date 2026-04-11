@@ -31,17 +31,17 @@ public class HomeServlet_login extends HttpServlet {
 
     switch (req.getServletPath()) {
       case "/home":
-        // nếu muốn: show landing/redirect sang login
+
         resp.sendRedirect(ctx + "/auth/login");
         return;
 
       case "/account":
-        // chỉ cho user đã login
+
         HttpSession s = req.getSession(false);
         if (s == null || s.getAttribute("user") == null) {
-          resp.sendRedirect(ctx + "/auth/login");     // chưa login → vào login
+          resp.sendRedirect(ctx + "/auth/login");    
         } else {
-          forward(req, resp, "/TaiKhoan.jsp");        // đã login → vào trang tài khoản
+          forward(req, resp, "/TaiKhoan.jsp");      
         }
         return;
 

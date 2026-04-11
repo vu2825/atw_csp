@@ -8,7 +8,19 @@
 
   <session-config>
     <session-timeout>30</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+      <secure>true</secure>
+      <same-site>Strict</same-site>
+    </cookie-config>
+    <tracking-mode>COOKIE</tracking-mode>
   </session-config>
+
+  <context-param>
+    <param-name>DEBUG_MODE</param-name>
+    <param-value>false</param-value>
+  </context-param>
+
 
   <servlet>
     <servlet-name>default</servlet-name>

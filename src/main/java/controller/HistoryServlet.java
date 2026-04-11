@@ -28,13 +28,12 @@ public class HistoryServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     if (ds == null) {
-      // ✅ thống nhất đúng tên JNDI
+
       throw new ServletException("DataSource jdbc/loginDB chưa được cấu hình hoặc sai tên JNDI.");
     }
     historyDAO = new HistoryDAO(ds);
   }
 
-  /** ✅ LẤY userId từ session như Watchlist: không tạo session mới, không gán 1, nếu chưa login thì redirect */
   private Integer requireUserIdOrRedirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 	    HttpSession session = req.getSession(false); // ❗ không tạo mới
 	    if (session == null) {
@@ -44,20 +43,17 @@ public class HistoryServlet extends HttpServlet {
 	        return null;
 	    }
 
-	    // ✅ LẤY user từ session (đã lưu khi login)
 	    User_login u = (User_login) session.getAttribute("user");
 	    if (u != null) {
-	        return (int) u.getId(); // ✅ Lấy userId thực tế từ object User_login
+	        return (int) u.getId(); 
 	    }
 
-	    // 🔁 fallback nếu vẫn dùng session.setAttribute("userId", 1);
 	    Object uid = session.getAttribute("userId");
 	    if (uid instanceof Integer) return (Integer) uid;
 	    if (uid != null) {
 	        try { return Integer.parseInt(uid.toString()); } catch (NumberFormatException ignore) {}
 	    }
 
-	    // ❌ nếu chưa login -> redirect sang /login
 	    String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
 	    resp.sendRedirect(req.getContextPath() + "/login?redirect=" +
 	        URLEncoder.encode(back, StandardCharsets.UTF_8));
@@ -70,14 +66,13 @@ public class HistoryServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
 
-    // ✅ dùng hàm chuẩn giống Watchlist
     Integer userId = requireUserIdOrRedirect(req, resp);
-    if (userId == null) return; // đã redirect nếu chưa đăng nhập
+    if (userId == null) return; 
 
     try {
       List<HistoryItem> list = historyDAO.findByUser(userId);
       req.setAttribute("history", list);
-      // đổi path nếu JSP của bạn nằm ở /views/history.jsp
+
       RequestDispatcher rd = req.getRequestDispatcher("/history.jsp");
       rd.forward(req, resp);
     } catch (SQLException e) {
@@ -90,7 +85,6 @@ public class HistoryServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
 
-    // ✅ cũng lấy userId giống Watchlist
     Integer userId = requireUserIdOrRedirect(req, resp);
     if (userId == null) return;
 

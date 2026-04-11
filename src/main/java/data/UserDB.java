@@ -1,6 +1,5 @@
 package data;
 
-import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +24,7 @@ public class UserDB {
 		this.dataSource = ds;
 	}
 
-	// Setter tùy chọn nếu cần thay đổi
+
 	public void setDataSource(DataSource ds) {
 		this.dataSource = ds;
 	}
@@ -50,7 +49,7 @@ public class UserDB {
 	}
 
 	public User getUserById(int id) {
-		User user = null; // Hoặc Optional<User> để best practice
+		User user = null; 
 		try (Connection conn = dataSource.getConnection();
 				PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?")) {
 			ps.setInt(1, id);
@@ -67,7 +66,7 @@ public class UserDB {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return user; // Trả về User hoặc null nếu không tìm thấy
+		return user;
 	}
 
 	public void updateWallet(double newWallet, int userId) {
@@ -87,10 +86,10 @@ public class UserDB {
 						.prepareStatement("INSERT INTO topup_requests (user_id, amount, status) VALUES (?,?,?)")) {
 
 			ps.setInt(1, userId);
-			ps.setDouble(2, amount); // dùng DECIMAL/BigDecimal cho tiền
-			ps.setString(3, "pending"); // khớp enum/lược đồ
+			ps.setDouble(2, amount);
+			ps.setString(3, "pending"); 
 
-			ps.executeUpdate(); // INSERT dùng executeUpdate
+			ps.executeUpdate(); 
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -119,7 +118,7 @@ public class UserDB {
 				}
 			}
 		} catch (SQLException e) {
-			// log and/or rethrow as needed
+
 			e.printStackTrace();
 		}
 		return list;
@@ -147,7 +146,7 @@ public class UserDB {
 				}
 			}
 		} catch (SQLException e) {
-			// log and/or rethrow as needed
+
 			e.printStackTrace();
 		}
 		return list;
@@ -175,12 +174,32 @@ public class UserDB {
 				}
 			}
 		} catch (SQLException e) {
-			// log and/or rethrow as needed
+
 			e.printStackTrace();
 		}
 		return list;
 	}
-	
+        public Boolean checkUserIsPremium(int userId) {
+	    final String sql = """
+	        SELECT 1
+	        FROM users_subscription
+	        WHERE user_id = ?
+	          AND status = 'active'
+	          AND expires_at > NOW()
+	        LIMIT 1
+	    """;
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setInt(1, userId);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            return rs.next();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 	public List<TopUpRequest> findAllTopupsOfUser(int userId) {
 	    List<TopUpRequest> list = new ArrayList<>();
 	    String sql = "SELECT id, user_id, amount, status, created_at, updated_at " +

@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:1405@localhost:5432/odysseus"
+      ],
+      "alwaysAllow": ["query"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": { "DEFAULT_MINIMUM_TOKENS": "6000" },
+      "alwaysAllow": ["resolve-library-id", "query-docs"]
+    },
+    "exa": {
+      "command": "npx",
+      "args": ["-y", "exa-mcp-server"],
+      "env": { "EXA_API_KEY": "d102918f-7f86-4612-9627-0398d8003dae" }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "tavily": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@0.2.3"],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      }
+    },
+    "serper-search": {
+      "command": "npx",
+      "args": ["-y", "serper-search-scrape-mcp-server"],
+      "env": {
+        "SERPER_API_KEY": "9d256f8a9962e805444be262438823a4c3d82a1f"
+      }
+    },
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus@latest", "mcp"]
+    }
+  }
+}
