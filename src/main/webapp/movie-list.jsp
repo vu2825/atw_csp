@@ -15,7 +15,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh Sách Phim - HCMUTE</title>
     <link rel="stylesheet" href="<%= ctx %>/styles/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb"
+      crossorigin="anonymous">
     <style>
         .container {
             max-width: 1400px;
